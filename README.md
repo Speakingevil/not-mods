@@ -1,1 +1,1 @@
-# not-mods
+#[ModKit Wiki](../../wiki)

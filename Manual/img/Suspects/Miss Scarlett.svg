@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="150"
+   height="200"
+   viewBox="0 0 39.687499 52.916668"
+   version="1.1"
+   id="svg8"
+   inkscape:version="1.0.1 (3bc2e813f5, 2020-09-07)"
+   sodipodi:docname="Miss Scarlet.svg">
+  <defs
+     id="defs2" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="2.8"
+     inkscape:cx="65.75889"
+     inkscape:cy="113.55762"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layer1"
+     inkscape:document-rotation="0"
+     showgrid="false"
+     units="px"
+     inkscape:window-width="1920"
+     inkscape:window-height="1001"
+     inkscape:window-x="-9"
+     inkscape:window-y="-9"
+     inkscape:window-maximized="1" />
+  <metadata
+     id="metadata5">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <path
+       style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.452173;stroke-opacity:1"
+       d="m 8.1453867,32.033483 c 0,0 0.368701,4.947086 -2.003274,8.315476 C 3.2975407,43.5722 2.1242617,44.733734 4.5357137,47.949 L 24.663788,47.918205 24.474799,32.043244"
+       id="path840"
+       sodipodi:nodetypes="ccccc" />
+    <path
+       id="path833"
+       style="fill:#ffffff;stroke:#000000;stroke-width:0.438457;stroke-opacity:1;fill-opacity:1"
+       d="m 32.805068,26.600072 c 0,8.532676 -9.27278,17.566443 -12.971851,17.566443 -4.143313,0 -12.9718507,-9.033767 -12.9718511,-17.566443 0,-8.532676 5.8076961,-13.333111 12.9718511,-13.33311 7.164155,0 12.971851,4.800434 12.971851,13.33311 z"
+       sodipodi:nodetypes="sssss" />
+    <path
+       style="fill:#000000;stroke:#000000;stroke-width:0.452173;stroke-opacity:1"
+       d="m 11.150297,16.630952 c 4.813621,-5.886511 10.172851,-5.359704 14.363096,-4.819196 8.257692,2.850569 9.900799,11.843253 10.032002,14.977305 0.913196,15.896133 -3.110394,20.978732 -3.110394,20.978732 0,0 0,0 -7.771213,0.150412 l -8.41e-4,-5.792759 C 25.458566,22.579788 23.842116,24.250397 11.150297,16.630952 Z"
+       id="path836"
+       sodipodi:nodetypes="ccccccc" />
+    <path
+       style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.452173;stroke-opacity:1"
+       d="m 11.150297,16.630952 c 2.843776,2.117804 1.36023,16.330682 -3.0049103,15.402531 C 3.2470583,26.834772 7.1898033,19.508196 11.150297,16.630952 Z"
+       id="path838"
+       sodipodi:nodetypes="ccc" />
+    <path
+       style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.272461;stroke-opacity:1"
+       d="m 17.877754,37.851071 c 1.214681,0 2.429363,0 3.644045,0 l 2.720295,1.570563 c -2.952669,1.608676 -6.274812,1.510841 -9.222596,0.0091 z"
+       id="path842"
+       sodipodi:nodetypes="ccccc" />
+  </g>
+</svg>
