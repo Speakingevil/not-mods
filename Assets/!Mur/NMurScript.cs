@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -47,6 +47,7 @@ public class NMurScript : MonoBehaviour {
     private void Activate()
     {
         bool[] edgeinfo = new bool[3] { edgework.IsIndicatorPresent(Indicator.TRN), edgework.GetPorts().Where(x => x == "StereoRCA").Count() > 2 || edgework.GetPortPlates().Where(x => x.Length == 1).Any(x => x[0] == "StereoRCA"), edgework.GetSerialNumberNumbers().Sum() > 14 };
+        Debug.Log(edgework.GetSerialNumberNumbers().Sum());
         Debug.LogFormat("[Not Murder #{0}] Building layout:\n[Not Murder #{0}] {1}\n[Not Murder #{0}] {2}", moduleID, string.Join(" | ", dispinfo[2].Where((x, k) => k < 3).Select(x => new string[] { "Bal", "Bil", "Con", "Din", "Hal", "Kit", "Lib", "Lou", "Stu" }[x]).ToArray()), string.Join(" | ", dispinfo[2].Where((x, k) => k > 2).Select(x => new string[] { "Bal", "Bil", "Con", "Din", "Hal", "Kit", "Lib", "Lou", "Stu" }[x]).ToArray()));
         Debug.LogFormat("[Not Murder #{0}] Initial state:\n[Not Murder #{0}] {1}", moduleID, string.Join("\n[Not Murder #" + moduleID + "] ", turns[0].Select((x, k) => new string[] { "Miss Scarlett", "Colonel Mustard", "Reverand Green", "Mrs Peacock", "Professor Plum", "Mrs White" }[dispinfo[0][k]] + " was in the " + new string[] { "Ballroom", "Billiard Room", "Conservatory", "Dining Room", "Hall", "Kitchen", "Library", "Lounge", "Study" }[x[0]] + " with the " + new string[] { "Candlestick", "Dagger", "Lead Pipe", "Revolver", "Rope", "Spanner" }[x[1]] + ".").ToArray()));
         for(int i = 0; i < 5; i++)
@@ -63,7 +64,7 @@ public class NMurScript : MonoBehaviour {
                             adjtos[k] = turns[i].Select(x => x[0]).Count(x => x == adj[k]);
                         int max = adjtos.Max();
                         if (max == 0)
-                            suspectlist[j][0] = (turns[i][j][0] + 3) % 3;
+                            suspectlist[j][0] = dispinfo[2][(dispinfo[2].IndexOf(turns[i][j][0]) + 3) % 6];
                         else if (adjtos.Count(x => x == max) > 1)
                             suspectlist[j][0] = turns[i][j][0];
                         else
@@ -79,16 +80,18 @@ public class NMurScript : MonoBehaviour {
                                 suspectlist[j][0] = turns[i][j][0];
                             else if (adjtom.Count(x => x == false) == 1)
                                 suspectlist[j][0] = adj[Array.IndexOf(adjtom, false)];
-                            else if((turns[i][j][0] == dispinfo[2][1] && !adjtom[Array.IndexOf(adj, dispinfo[2][2])]) || (turns[i][j][0] == dispinfo[2][4] && !adjtom[Array.IndexOf(adj, dispinfo[2][3])]))
-                                suspectlist[j][0] = dispinfo[2][(dispinfo[2].IndexOf(turns[i][j][0]) + 3) % 3];
+                            else if((turns[i][j][0] == dispinfo[2][1] && adjtom[Array.IndexOf(adj, dispinfo[2][2])]) || (turns[i][j][0] == dispinfo[2][4] && adjtom[Array.IndexOf(adj, dispinfo[2][3])]))
+                                suspectlist[j][0] = dispinfo[2][(dispinfo[2].IndexOf(turns[i][j][0]) + 3) % 6];
                             else
                                 suspectlist[j][0] = dispinfo[2][new int[] { 1, 2, 5, 0, 3, 4}[dispinfo[2].IndexOf(turns[i][j][0])]];
                         }
                         else
                         {
-                            if (turns[i].Where(x => x[0] == turns[i][j][0]).Any(x => x[1] == 3))
-                                suspectlist[j][0] = turns[i][j][0];
-                            for(int k = 0; k < adj.Length; k++)
+                            if (adj.Contains(dispinfo[2][1]))
+                                suspectlist[j][0] = dispinfo[2][1];
+                            else
+                                suspectlist[j][0] = dispinfo[2][4];
+                            for (int k = 0; k < adj.Length; k++)
                             {
                                 if(turns[i].Where(x => adj[k] == x[0]).Any(x => x[1] == 3))
                                 {
@@ -96,10 +99,6 @@ public class NMurScript : MonoBehaviour {
                                     break;
                                 }
                             }
-                            if (adj.Contains(dispinfo[2][1]))
-                                suspectlist[j][0] = dispinfo[2][1];
-                            else
-                                suspectlist[j][0] = dispinfo[2][4];
                         }
                         break;
                     case 2:
@@ -180,7 +179,7 @@ public class NMurScript : MonoBehaviour {
         foreach (KMSelectable button in buttons)
         {
             int b = Array.IndexOf(buttons, button);
-            button.OnInteract += delegate () { ButtonPress(b, edgeinfo[b / 3]); return false; };
+            button.OnInteract += delegate () { ButtonPress(b, edgeinfo[b / 2]); return false; };
         }
     }
 
@@ -224,7 +223,7 @@ public class NMurScript : MonoBehaviour {
             }
             else
             {
-                selection[b / 2] = (selection[b / 2] + ((b % 2 == 0 ^ d) ? (dispinfo[b / 2].Count() - 1) : 1)) % dispinfo[b / 2].Count();
+                selection[b / 2] = (selection[b / 2] + (((b % 2 == 0) ^ d) ? (dispinfo[b / 2].Count() - 1) : 1)) % dispinfo[b / 2].Count();
                 Audio.PlayGameSoundAtTransform(dispinfo[0].Count() > 4 && selection[b / 2] == 0 ? KMSoundOverride.SoundEffect.ButtonPress : KMSoundOverride.SoundEffect.BigButtonPress, buttons[b].transform);
                 switch(b / 2)
                 {
