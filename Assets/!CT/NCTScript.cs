@@ -260,11 +260,11 @@ public class NCTScript : MonoBehaviour {
     private IEnumerator ProcessTwitchCommand(string command)
     {
         command = command.ToLowerInvariant();
-        if (off)
+        while (off)
             yield return true;
         if (initialphase)
         {
-            if(command.Length != 7 || !command.Contains("up at "))
+            if(command.Length != 7 || !command.Contains("up at ") || !"0123456789".Contains(command.Last().ToString()))
             {
                 yield return "sendtochaterror!f " + command + " is invalid syntax for flip up commands.";
                 yield break;
@@ -281,6 +281,8 @@ public class NCTScript : MonoBehaviour {
                 yield return "sendtochaterror!f " + command + " is invalid syntax for transmission commands.";
                 yield break;
             }
+            yield return "solve";
+            yield return "strike";
             int time = (int)info.GetTime();
             for (int i = 0; i < commands[1].Length; i++)
             {
@@ -297,23 +299,23 @@ public class NCTScript : MonoBehaviour {
 
     private IEnumerator TwitchHandleForcedSolve()
     {
-        if (off)
+        yield return null;
+        while (off)
             yield return true;
         if (initialphase)
         {
-            yield return null;
             while ((int)info.GetTime() % 10 != timesub[0])
-                yield return true;
+                yield return false;
             flip.OnInteract();
         }
         else
             timesub[1] = timesub[0];
+        morsesub[1] = "";
         int time = (int)info.GetTime();
         for(int i = 0; i < morsesub[0].Length; i++)
         {
             while ((int)info.GetTime() == time)
-                yield return true;
-            yield return null;
+                yield return false;
             flip.OnInteract();
             yield return new WaitForSeconds(morsesub[0][i] == '.' ? 0.1f : 1.1f);
             flip.OnInteractEnded();

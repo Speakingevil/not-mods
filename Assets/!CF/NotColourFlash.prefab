@@ -918,7 +918,7 @@ MonoBehaviour:
   m_Script: {fileID: -119419473, guid: 45b809be76fd7a3468b6f517bced6f28, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ModuleType: notlColourFlash
+  ModuleType: notColourFlash
   ModuleDisplayName: Not Colour Flash
   RequiresTimerVisibility: 1
 --- !u!114 &114368816607283236
@@ -972,7 +972,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShaderNames:
-  - Mobile/Diffuse
+  - KT/Mobile/DiffuseTint
 --- !u!114 &114441965667460626
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -996,7 +996,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShaderNames:
-  - Mobile/Diffuse
+  - KT/Mobile/Diffuse
 --- !u!114 &114525735764107152
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1022,7 +1022,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShaderNames:
-  - Mobile/Diffuse
+  - Standard
 --- !u!114 &114596227778692338
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1057,7 +1057,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShaderNames:
-  - Mobile/Diffuse
+  - Standard
 --- !u!114 &114931491883170288
 MonoBehaviour:
   m_ObjectHideFlags: 1

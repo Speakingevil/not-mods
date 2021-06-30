@@ -45,7 +45,7 @@ public class NMorScript : MonoBehaviour {
         "PANIC", "PHONE", "PIANO", "PIVOT", "PLUMB", "POLAR", "PRAWN", "PRISM",
         "QOPHS", "QUACK", "QUALM", "QUERY", "QUINT", "QUIRK", "QUITS", "QUOTA",
         "RADIX", "RAINY", "RECON", "RHYME", "RIVAL", "ROAST", "ROUND", "RULES",
-        "SALTY", "SCARF", "SCHWA", "SHAPE", "SIXTY", "SPIKY", "SQUID", "STRAW",
+        "SALTY", "SCARF", "SCHWA", "SHAPE", "SOLID", "SPIKY", "SQUID", "STRAW",
         "TABLE", "TAWNY", "THIRD", "TILDE", "TOPIC", "TORUS", "TREND", "TWEAK",
         "UMBRA", "UNARY", "UNBOX", "UNCLE", "UNIFY", "UNZIP", "UPSET", "URBAN",
         "VAULT", "VENOM", "VIDEO", "VINYL", "VIXEN", "VOICE", "VOLTS", "VOWEL",
@@ -94,7 +94,7 @@ public class NMorScript : MonoBehaviour {
         else if ("AEIOU".Contains(word[1][4].ToString()))
             codes[0] = new int[7] { 6, 5, 1, 2, 4, 3, 0 };
         else if (word[1].Where((x, k) => x == word[0][k]).Count() < 1)
-            codes[0] = new int[7] { 4, 3, 2, 1, 0, 5, 6 };
+            codes[0] = new int[7] { 4, 3, 2, 1, 0, 6, 5 };
         else
             codes[0] = new int[7] { 0, 1, 2, 3, 4, 5, 6, };
         Debug.LogFormat("[Not Morsematics #{0}] The shape subsequence is {1}", moduleID, string.Join("", codes[0].Select(x => "IJZTOSL"[x].ToString()).ToArray()));
@@ -210,7 +210,7 @@ public class NMorScript : MonoBehaviour {
         else
             answer[0] = MasterCommand("ABCD1234");
         List<string> logconds = new List<string> { };
-        if(!presenttets[0].Contains(4) && !presenttets[1].Contains(4))
+        if(!presenttets[0].Contains(4) && !presenttets[1].Contains(0))
         {
             int x = answer[0][0];
             answer[0][0] = answer[0][7];
@@ -294,7 +294,6 @@ public class NMorScript : MonoBehaviour {
             }
         }
         Debug.LogFormat("[Not Morsematics #{0}] The master command is {1}", moduleID, y);
-        Debug.Log(string.Join("", x.Select(k => "IJZTOSL"[k].ToString()).ToArray()));
         return x;
     }
 
@@ -358,7 +357,7 @@ public class NMorScript : MonoBehaviour {
         {
             displays[2].text = "--";
             if (answer[1].Count() < 1)
-                Debug.LogFormat("[Not Morsematics #{0}] Submitted nothing.");
+                Debug.LogFormat("[Not Morsematics #{0}] Submitted nothing.", moduleID);
             else
                 Debug.LogFormat("[Not Morsematics #{0}] Submitted keypresses {1}", moduleID, string.Join("", answer[1].Select(x => "IJZTOSL"[x].ToString()).ToArray()));
             StopCoroutine("Countdown");

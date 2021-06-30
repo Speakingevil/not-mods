@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -179,7 +179,7 @@ public class NMurScript : MonoBehaviour {
         foreach (KMSelectable button in buttons)
         {
             int b = Array.IndexOf(buttons, button);
-            button.OnInteract += delegate () { ButtonPress(b, edgeinfo[b / 2]); return false; };
+            button.OnInteract += delegate () { ButtonPress(b, b == 6 ? false : edgeinfo[b / 2]); return false; };
         }
     }
 
@@ -282,7 +282,7 @@ public class NMurScript : MonoBehaviour {
                 {
                     yield return null;
                     buttons[press].OnInteract();
-                    yield return new WaitForSeconds(0.5f);
+                    yield return new WaitForSeconds(1);
                 }
             }
             else if(commands[0] == "select")

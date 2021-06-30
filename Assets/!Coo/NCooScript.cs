@@ -35,7 +35,7 @@ public class NCooScript : MonoBehaviour {
     private int[] pos = new int[4];
     private int[] dir = new int[4];
     private bool[] back = new bool[4];
-    private int[][] glitched = new int[2][] { new int[9], new int[9]};
+    private int[][] glitched = new int[2][] { new int[0], new int[0]};
     private bool[] glitching = new bool[2];
 
     private static int moduleIDCounter;
@@ -87,11 +87,11 @@ public class NCooScript : MonoBehaviour {
             case 6: d = string.Format("\"{0}, {1}\"", 8 - (input / 9), input % 9); break;
             case 7: d = string.Format("{0}/{1}", 9 - (input / 9), (input % 9) + 1); break;
             case 8: d = "[" + input.ToString() + "]"; break;
-            case 9: d = (input + 1).ToString() + new string[] {"st", "nd", "rd", "th", "th", "th", "th", "th", "th", "th"}[input % 10]; break;
+            case 9: d = (input + 1).ToString() + ((input / 10) == 1 ? "th" : new string[] {"st", "nd", "rd", "th", "th", "th", "th", "th", "th", "th"}[input % 10]); break;
             case 10: d = "#" + (((8 - (input / 9)) * 9) + (input % 9) + 1).ToString(); break;
             case 11:
                 int c = ((8 - (input % 9)) * 9) + (input / 9) + 1;
-                d = " 一二三四五六七八九"[c / 10] + (c > 9 ? "十" : "") + " 一二三四五六七八九"[c % 10];
+                d = "  二三四五六七八九"[c / 10] + (c > 9 ? "十" : "") + " 一二三四五六七八九"[c % 10];
                 d.Replace(" ", ""); break;
             case 12:
                 int[] focus = new int[2] { (input / 9) - 4, (input % 9) - 4 };
@@ -337,8 +337,11 @@ public class NCooScript : MonoBehaviour {
                             for (int i = 0; i < 2; i++)
                             {
                                 obj[i + 1].SetActive(true);
-                                int[][] g = new int[2][] { new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8 }.Shuffle(), new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8 }.Shuffle() };
-                                glitched[i] = g[0].Select((x, k) => (x * 9) + g[1][k]).ToArray();
+                                for (int j = 0; j < 3; j++)
+                                {
+                                    int[][] g = new int[2][] { new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8 }.Shuffle(), new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8 }.Shuffle() };
+                                    glitched[i] = glitched[i].Concat(g[0].Select((x, k) => (x * 9) + g[1][k])).ToArray();
+                                }
                             }
                             UpdateShape();
                         }
@@ -430,7 +433,7 @@ public class NCooScript : MonoBehaviour {
     }
 
 #pragma warning disable 414
-    private readonly string TwitchHelpMessage = "Phase 1: !{0} left/submit/right [l/m/r can be used as ahorthands]| !{0} <display> [Cycles to display] | Phase 2: !{0} left/right even/odd | !{0} submit";
+    private readonly string TwitchHelpMessage = "Phase 1: !{0} left/submit/right [l/m/r can be used as ahorthands] !{0} cycle | !{0} <display> [Cycles to display] | Phase 2: !{0} left/right even/odd | !{0} submit";
 #pragma warning restore 414
 
     private IEnumerator ProcessTwitchCommand(string command)
@@ -438,6 +441,16 @@ public class NCooScript : MonoBehaviour {
         command = command.ToLowerInvariant();
         if (gud.Any(x => x == false))
         {
+            if (command == "cycle")
+            {
+                for (int i = 0; i < seq[1].Count(); i++)
+                {
+                    yield return null;
+                    buttons[2].OnInteract();
+                    yield return new WaitForSeconds(1.8f);
+                }
+                yield break;
+            }
             int b = new List<string> { "left", "submit", "right", "l", "m", "r" }.IndexOf(command);
             if (b >= 0)
             {

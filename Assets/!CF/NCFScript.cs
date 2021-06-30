@@ -74,12 +74,12 @@ public class NCFScript : MonoBehaviour {
             for (int j = 0; j < 2; j++)
                 Debug.LogFormat("[Not Colour Flash #{0}] The {1} {2} order is: {3}", moduleID, i == 0 ? "displayed" : "transformed", j == 0 ? "word" : "colour", string.Join(", ", seq[j + (2 * i)].Select(x => new string[] { "Red", "Green", "Blue", "Magenta", "Yellow", "White" }[x]).ToArray()));
         bool[] cells = new bool[36] {
-        seq.Any(x => x[0] == 0), Array.IndexOf(seq[2], 1) > Array.IndexOf(seq[2], 5), Array.IndexOf(seq[3], 3) > 3, seq.All(x => Array.IndexOf(x, 2) != 2), Array.IndexOf(seq[0], 0) == Array.IndexOf(seq[2], 0), seq.Any(x => x[Array.IndexOf(seq[1], 4)] == 5),
+        seq.Any(x => x[0] == 0), Array.IndexOf(seq[2], 1) > Array.IndexOf(seq[2], 4), Array.IndexOf(seq[3], 3) > 3, seq.All(x => Array.IndexOf(x, 2) != 2), Array.IndexOf(seq[0], 0) == Array.IndexOf(seq[2], 0), seq.Any(x => x[Array.IndexOf(seq[1], 4)] == 5),
         new int[]{ 0, 5}.Any(x => x == Array.IndexOf(seq[3], 4)), seq.Select(x => Array.IndexOf(x, 1)).Distinct().Count() == 4, seq.Count(x => Array.IndexOf(x, 1) % 2 == 0) == 2, new int[]{ 2, 3}.Any(x => x == Array.IndexOf(seq[2], 3)), seq.Where((x, k) =>  k > 1).All(x => Array.IndexOf(x, 1) > 1), seq.Any(x => x[4] == 5),
-        seq.Where((x, k) => k < 2).Any(x => Array.IndexOf(x, 2) > 3), seq.Count(x => Array.IndexOf(x, 5) % 3 == 0) > 1, seq.Count(x => Mathf.Abs(Array.IndexOf(x, 1) - Array.IndexOf(x, 3)) == 1) > 1, seq.Where((x, k) => k > 1).All(x => Array.IndexOf(x, 0) < Array.IndexOf(x, 3)), seq[1][5] % 2 == 0, Mathf.Abs(Array.IndexOf(seq[2], 2) - Array.IndexOf(seq[2], 3)) == 1,
+        seq.Where((x, k) => k < 2).Any(x => Array.IndexOf(x, 2) > 2), seq.Count(x => Array.IndexOf(x, 5) % 3 == 0) > 1, seq.Count(x => Mathf.Abs(Array.IndexOf(x, 1) - Array.IndexOf(x, 3)) == 1) > 0, seq.Where((x, k) => k > 1).All(x => Array.IndexOf(x, 0) < Array.IndexOf(x, 3)), seq[1][5] % 2 == 0, Mathf.Abs(Array.IndexOf(seq[2], 2) - Array.IndexOf(seq[2], 3)) == 1,
         seq.Any(x => x[5] == 3), seq.Any(x => Array.IndexOf(x, 0) < Array.IndexOf(x, 1) && Array.IndexOf(x, 1) < Array.IndexOf(x, 2)), !seq[2].Where((x, k) => x == seq[3][k]).Any(), seq[0].Where((x, k) => x == seq[1][k]).Count() > 1, seq[0][5] < 3, seq.Any(x => x[1] == 3),
         seq[2].Where((x, k) => x == seq[3][k]).Count() > 1, seq.All(x => x[0] != 1), seq[1].Where((x, k) => x == seq[3][k]).Count() > 2, seq.Select(x => Array.IndexOf(x, 4)).Distinct().Count() == 2, seq.Any(x => Array.IndexOf(x, 0) % 2 == 1 && Array.IndexOf(x, 5) % 2 == 0), seq.Count(x => Array.IndexOf(x, 5) % 2 == 0) % 2 == 1,
-        seq.Where((x, k) => k > 1).Any(x => Array.IndexOf(x, 2) == 5 - Array.IndexOf(x, 4)), seq.All(x => Array.IndexOf(x, 5) != 1), seq[0].Any(x => x == 5 - seq[2][Array.IndexOf(seq[0], x)]), seq.Where((x, k) => k > 1).All(x => Mathf.Abs(Array.IndexOf(x, 1) - Array.IndexOf(x, 5)) == 1), (Array.IndexOf(seq[0], 5) % 2 == Array.IndexOf(seq[2], 5) % 2) && (Array.IndexOf(seq[1], 5) % 2 == Array.IndexOf(seq[3], 5) % 2), seq[1].Count(x => Mathf.Abs(x - seq[3][Array.IndexOf(seq[1], x)]) == 1) > 1};
+        seq.Where((x, k) => k > 1).Any(x => Array.IndexOf(x, 2) == 5 - Array.IndexOf(x, 4)), seq.All(x => Array.IndexOf(x, 5) != 1), Enumerable.Range(0, 6).Any(x => seq[0][x] == seq[2][5 - x]), seq.Where((x, k) => k > 1).All(x => Mathf.Abs(Array.IndexOf(x, 2) - Array.IndexOf(x, 5)) == 1), Array.IndexOf(seq[0], 5) % 2 == Array.IndexOf(seq[2], 5) % 2 && Array.IndexOf(seq[1], 5) % 2 == Array.IndexOf(seq[3], 5) % 2, Enumerable.Range(0, 6).Count(x => Mathf.Abs( Array.IndexOf(seq[1], x) - Array.IndexOf(seq[3], x)) == 1) > 1};
         List<int> flow = new List<int> { info.GetPortCount() % 2 == info.GetPortPlateCount() % 2 ? (seq[1][0] * 6) + seq[0][0] : (seq[0][0] * 6) + seq[1][0]};
         for(int i = 0; i < 11; i++)
         {
@@ -105,7 +105,8 @@ public class NCFScript : MonoBehaviour {
             buttons[0].AddInteractionPunch(0.2f);
             yield return new WaitForSeconds(0.4f);
             hold = true;
-            if (info.GetBatteryCount() % 3 == 0 ? (seq[1][pos[1]] * 6) + seq[0][pos[0]] == answer : (seq[0][pos[0]] * 6) + seq[1][pos[2]] == answer)
+            Debug.LogFormat("[Not Colour Flash #{0}] Submitted \"{1}\" in {2}.", moduleID, new string[] { "Red", "Green", "Blue", "Magenta", "Yellow", "White" }[seq[0][pos[0]]], new string[] { "Red", "Green", "Blue", "Magenta", "Yellow", "White" }[seq[1][pos[1]]]);
+            if (info.GetBatteryCount() % 3 == 0 ? (seq[1][pos[1]] * 6) + seq[0][pos[0]] == answer : (seq[0][pos[0]] * 6) + seq[1][pos[1]] == answer)
             {
                 moduleSolved = true;
                 Audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.CorrectChime, transform);
@@ -132,20 +133,23 @@ public class NCFScript : MonoBehaviour {
 
     private void Release(bool b)
     {
-        StopAllCoroutines();
-        if (hold)
+        if (!moduleSolved)
         {
-            Audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.BigButtonRelease, transform);
-            buttons[b ? 0 : 1].AddInteractionPunch();
+            StopAllCoroutines();
+            if (hold)
+            {
+                Audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.BigButtonRelease, transform);
+                buttons[b ? 0 : 1].AddInteractionPunch();
+            }
+            else
+            {
+                Audio.PlaySoundAtTransform("tick", transform);
+                pos[b ? 0 : 1]++;
+                pos[b ? 0 : 1] %= 6;
+                Display();
+            }
+            hold = false;
         }
-        else
-        {
-            Audio.PlaySoundAtTransform("tick", transform);
-            pos[b ? 0 : 1]++;
-            pos[b ? 0 : 1] %= 6;
-            Display();
-        }
-        hold = false;
     }
 
     private void Display()
@@ -242,7 +246,7 @@ public class NCFScript : MonoBehaviour {
 
     private IEnumerator TwitchHandleForcedSolve()
     {
-        int[] taps = new int[2] { answer / 6, answer % 6 };
+        int[] taps = info.GetBatteryCount() % 3 == 0 ? new int[2] { answer % 6, answer / 6 } : new int[2] { answer / 6, answer % 6};
         for (int i = 0; i < 2; i++)
         {
             while (seq[i][pos[i]] != taps[i])
