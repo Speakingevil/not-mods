@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -10,6 +12,7 @@ public class DisCFScript : MonoBehaviour {
     public KMBombModule module;
     public KMSelectable[] buttons;
     public TextMesh disp;
+    public TextMesh tptext;
     public GameObject matStore;
     public GameObject[] hidden;
     public Font[] fonts;
@@ -147,6 +150,8 @@ public class DisCFScript : MonoBehaviour {
                             module.HandlePass();
                             Audio.PlaySoundAtTransform("BlipSolve", transform);
                             StopCoroutine("Seq");
+                            if (TwitchPlaysActive)
+                                tptext.text = "";
                             disp.text = langdisps[0, Array.IndexOf(order, screen)];
                             disp.fontSize = 48;
                             disp.font = fonts[7];
@@ -178,6 +183,8 @@ public class DisCFScript : MonoBehaviour {
         {
             int a = order[screen];
             int[] f = Enumerable.Range(0, 9).Select(x => dispinfo[a, x]).ToArray();
+            if (TwitchPlaysActive)
+                tptext.text = (screen + 1).ToString();
             disp.text = disptext[a];
             disp.color = cols[0][f[1]];
             disp.font = fonts[f[4]];
@@ -195,5 +202,171 @@ public class DisCFScript : MonoBehaviour {
             screen++;
             screen %= 9;
         }
+    }
+
+    //twitch plays
+    bool TwitchPlaysActive;
+    bool TPHighlightActive;
+    #pragma warning disable 414
+    private readonly string TwitchHelpMessage = @"!{0} highlight <yes/no> <1-20> [Highlights the specified button for 1-20 seconds] | !{0} press yes <#> (#₂)... [Presses the Yes button on display '#' (optionally also '#₂' or more)] | !{0} press no [Presses the No button]";
+    #pragma warning restore 414
+    IEnumerator ProcessTwitchCommand(string command)
+    {
+        string[] parameters = command.Split(' ');
+        if (Regex.IsMatch(parameters[0], @"^\s*highlight\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
+        {
+            yield return null;
+            if (parameters.Length > 3)
+            {
+                yield return "sendtochaterror Too many parameters!";
+            }
+            else if (parameters.Length == 3)
+            {
+                if (!parameters[1].EqualsIgnoreCase("yes") && !parameters[1].EqualsIgnoreCase("no"))
+                {
+                    yield return "sendtochaterror!f The specified button to highlight '" + parameters[1] + "' is invalid!";
+                    yield break;
+                }
+                int temp = -1;
+                if (!int.TryParse(parameters[2], out temp))
+                {
+                    yield return "sendtochaterror!f The specified number of seconds to hold the " + parameters[1] + " button for '" + parameters[2] + "' is invalid!";
+                    yield break;
+                }
+                if (temp < 1 || temp > 20)
+                {
+                    yield return "sendtochaterror The specified number of seconds to hold the " + parameters[1] + " button for '" + parameters[2] + "' is out of range 1-20!";
+                    yield break;
+                }
+                if (TPHighlightActive)
+                {
+                    yield return "sendtochaterror Cannot interact with the module while a button is being highlighted!";
+                    yield break;
+                }
+                if (parameters[1].EqualsIgnoreCase("yes"))
+                    StartCoroutine(HighlightButtonTP(0, temp));
+                else
+                    StartCoroutine(HighlightButtonTP(1, temp));
+                while (TPHighlightActive) yield return "trycancel";
+            }
+            else if (parameters.Length == 2)
+            {
+                if (parameters[1].EqualsIgnoreCase("yes") || parameters[1].EqualsIgnoreCase("no"))
+                    yield return "sendtochaterror Please specify how long to highlight the " + parameters[1] + " button for!";
+                else
+                    yield return "sendtochaterror!f The specified button to highlight '" + parameters[1] + "' is invalid!";
+            }
+            else if (parameters.Length == 1)
+            {
+                yield return "sendtochaterror Please specify what button to highlight and how long to highlight it for!";
+            }
+            yield break;
+        }
+        if (Regex.IsMatch(parameters[0], @"^\s*press\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
+        {
+            yield return null;
+            if (parameters.Length >= 3)
+            {
+                if (parameters[1].EqualsIgnoreCase("no"))
+                {
+                    yield return "sendtochaterror Too many parameters!";
+                    yield break;
+                }
+                List<int> presses = new List<int>();
+                for (int i = 2; i < parameters.Length; i++)
+                {
+                    int temp = -1;
+                    if (!int.TryParse(parameters[i], out temp))
+                    {
+                        yield return "sendtochaterror!f The specified display to press the yes button at '" + parameters[i] + "' is invalid!";
+                        yield break;
+                    }
+                    if (temp < 1 || temp > 9)
+                    {
+                        yield return "sendtochaterror The specified display to press the yes button at '" + parameters[i] + "' is out of range 1-9!";
+                        yield break;
+                    }
+                    if (presses.Contains(temp) || selection.Contains(temp))
+                    {
+                        yield return "sendtochaterror The specified display to press the yes button at '" + parameters[i] + "' cannot be submitted twice!";
+                        yield break;
+                    }
+                    presses.Add(temp);
+                }
+                if (TPHighlightActive)
+                {
+                    yield return "sendtochaterror Cannot interact with the module while a button is being highlighted!";
+                    yield break;
+                }
+                while (presses.Count > 0)
+                {
+                    if (presses.Contains(screen + 1))
+                    {
+                        if (selection.Count(x => x == -1) == 1)
+                        {
+                            buttons[0].OnInteract();
+                            presses.Remove(screen + 1);
+                            break;
+                        }
+                        else
+                        {
+                            buttons[0].OnInteract();
+                            presses.Remove(screen + 1);
+                        }
+                    }
+                    else
+                        yield return "trycancel";
+                }
+            }
+            else if (parameters.Length == 2)
+            {
+                if (parameters[1].EqualsIgnoreCase("yes"))
+                    yield return "sendtochaterror Please specify at least one display to press the yes button at!";
+                else if (!parameters[1].EqualsIgnoreCase("no"))
+                    yield return "sendtochaterror!f The specified button to press '" + parameters[1] + "' is invalid!";
+                if (TPHighlightActive)
+                {
+                    yield return "sendtochaterror Cannot interact with the module while a button is being highlighted!";
+                    yield break;
+                }
+                buttons[1].OnInteract();
+            }
+            else if (parameters.Length == 1)
+            {
+                yield return "sendtochaterror Please specify what button press and at least one display if you wish to press the yes button!";
+            }
+            yield break;
+        }
+    }
+
+    IEnumerator TwitchHandleForcedSolve()
+    {
+        while (TPHighlightActive) yield return true;
+        List<int> presses = new List<int>();
+        int[] ans = Enumerable.Range(0, 3).Select(x => Array.IndexOf(order, x) + 1).OrderBy(x => x).ToArray();
+        for (int i = 0; i < 3; i++)
+        {
+            if (!selection.Contains(ans[i]))
+                presses.Add(ans[i]);
+        }
+        while (presses.Count > 0)
+        {
+            if (presses.Contains(screen + 1))
+            {
+                buttons[0].OnInteract();
+                presses.Remove(screen + 1);
+            }
+            else
+                yield return true;
+        }
+    }
+
+    IEnumerator HighlightButtonTP(int btn, int time)
+    {
+        TPHighlightActive = true;
+        buttons[btn].OnHighlight();
+        yield return new WaitForSeconds(time);
+        buttons[btn].OnHighlightEnded();
+        TPHighlightActive = false;
     }
 }

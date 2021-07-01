@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using UnityEngine;
 
 public class NtBScript : MonoBehaviour {
@@ -14,6 +15,7 @@ public class NtBScript : MonoBehaviour {
     public Renderer[] brends;
     public Material[] bulbcols;
     public Material[] screwcols;
+    public Color[] lightcols;
     public GameObject[] lights;
     public TextMesh cbtext;
     public AudioClip[] sound;
@@ -57,6 +59,7 @@ public class NtBScript : MonoBehaviour {
             light.SetActive(false);
         }
         properties = new int[3] { Random.Range(0, 6), Random.Range(0, 5), Random.Range(0, 2)};
+        lights[0].GetComponent<Light>().color = lights[1].GetComponent<Light>().color = lightcols[properties[0]];
         brends[0].material = bulbcols[properties[0]];
         brends[1].material = screwcols[properties[1]];
         if (properties[2] == 1)
@@ -220,10 +223,100 @@ public class NtBScript : MonoBehaviour {
         yield return new WaitForSeconds(0.5f);
         for(int i = 0; i < 20; i++)
         {
-            bulb[0].transform.Translate(new Vector3(0, -0.0075f * i, 0), Space.World);
+            if (Application.isEditor)
+                bulb[0].transform.Translate(new Vector3(0, 0, -0.0075f * i), Space.World);
+            else
+                bulb[0].transform.Translate(new Vector3(0, -0.0075f * i, 0), Space.World);
             yield return new WaitForSeconds(0.02f);
         }
         Audio.PlaySoundAtTransform("Break", bulb[0].transform);
         bulb[0].SetActive(false);
+    }
+
+    //twitch plays
+    #pragma warning disable 414
+    private readonly string TwitchHelpMessage = @"!{0} <B/I/O> [Presses the bulb, I button, or O button] | !{0} colorblind [Toggles colorblind mode] | Presses can be chained, for ex: !{0} IOOIB";
+    #pragma warning restore 414
+    IEnumerator ProcessTwitchCommand(string command)
+    {
+        if (Regex.IsMatch(command, @"^\s*colorblind\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
+        {
+            yield return null;
+            if (cb)
+            {
+                cb = false;
+                cbtext.text = "";
+            }
+            else
+            {
+                cb = true;
+                cbtext.text = new string[] { "RED", "GREEN", "BLUE", "YELLOW", "PURPLE", "WHITE" }[properties[0]];
+            }
+            yield break;
+        }
+        if (command.Split(' ').Length > 1)
+        {
+            yield return "sendtochaterror Too many parameters!";
+            yield break;
+        }
+        string[] valids = { "B", "I", "O" };
+        for (int i = 0; i < command.Length; i++)
+        {
+            if (!valids.Contains(command[i].ToString().ToUpper()))
+            {
+                yield return "sendtochaterror!f The specified character '" + command[i] + "' is invalid!";
+                yield break;
+            }
+        }
+        yield return null;
+        for (int i = 0; i < command.Length; i++)
+        {
+            if (command[i].EqualsAny('B', 'b'))
+                buttons[1].OnInteract();
+            else if (command[i].EqualsAny('I', 'i'))
+            {
+                if (properties[2] == 0)
+                    buttons[2].OnInteract();
+                else
+                    buttons[0].OnInteract();
+            }
+            else if (command[i].EqualsAny('O', 'o'))
+            {
+                if (properties[2] == 0)
+                    buttons[0].OnInteract();
+                else
+                    buttons[2].OnInteract();
+            }
+            yield return new WaitForSeconds(0.2f);
+        }
+    }
+
+    IEnumerator TwitchHandleForcedSolve()
+    {
+        while (transmit[0]) yield return true;
+        int start = 9 - indices.Count;
+        for (int i = start; i < 9; i++)
+        {
+            int start2 = 0;
+            if (ans.Select((x, a) => x == target[a]).All(x => x))
+                start2 = 4;
+            else if (ans[1] == target[0] && ans[2] == target[1] && ans[3] == target[2])
+                start2 = 3;
+            else if (ans[2] == target[0] && ans[3] == target[1])
+                start2 = 2;
+            else if (ans[3] == target[0])
+                start2 = 1;
+            for (int j = start2; j < 4; j++)
+            {
+                if (target[j])
+                    buttons[2].OnInteract();
+                else
+                    buttons[0].OnInteract();
+                yield return new WaitForSeconds(0.2f);
+            }
+            buttons[1].OnInteract();
+            if (i != 8)
+                yield return new WaitForSeconds(0.2f);
+        }
     }
 }
