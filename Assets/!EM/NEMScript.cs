@@ -1,8 +1,9 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using KModkit;
+using System.Text.RegularExpressions;
+using System.Collections;
 
 public class NEMScript : MonoBehaviour {
 
@@ -127,5 +128,88 @@ public class NEMScript : MonoBehaviour {
         for (int i = 0; i < 4; i++)
             ans[0] += ((n / (int)Mathf.Pow(10, 3 - i)) % 10) * (int)Mathf.Pow(10, 3 - order[i]);
         Debug.LogFormat("[Not Emoji Math #{0}] The final code is {1}.", moduleID, ans[0]);
+    }
+
+    //twitch plays
+    #pragma warning disable 414
+    private readonly string TwitchHelpMessage = @"!{0} submit <code> [Submits the specified code] | Valid codes must be 1-4 digits long";
+    #pragma warning restore 414
+    IEnumerator ProcessTwitchCommand(string command)
+    {
+        string[] parameters = command.Split(' ');
+        if (Regex.IsMatch(parameters[0], @"^\s*submit\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
+        {
+            yield return null;
+            if (parameters.Length > 2)
+            {
+                yield return "sendtochaterror Too many parameters!";
+            }
+            else if (parameters.Length == 2)
+            {
+                int temp = -1;
+                if (!int.TryParse(parameters[1], out temp) || parameters[1].Contains('-'))
+                {
+                    yield return "sendtochaterror!f The specified code '" + parameters[1] + "' is invalid!";
+                    yield break;
+                }
+                if (parameters[1].Length > 4)
+                {
+                    yield return "sendtochaterror The specified code '" + parameters[1] + "' is more than four digits long!";
+                    yield break;
+                }
+                for (int i = 0; i < parameters[1].Length; i++)
+                {
+                    buttons[int.Parse(parameters[1][i].ToString())].OnInteract();
+                    yield return new WaitForSeconds(0.1f);
+                }
+                buttons[11].OnInteract();
+            }
+            else if (parameters.Length == 1)
+            {
+                yield return "sendtochaterror Please specify a code to submit!";
+            }
+            yield break;
+        }
+    }
+
+    IEnumerator TwitchHandleForcedSolve()
+    {
+        bool clrPress = false;
+        string curr = "";
+        string answer = ans[0].ToString();
+        if (display.text != d)
+        {
+            curr = display.text;
+            if (curr.Length > answer.Length)
+            {
+                buttons[10].OnInteract();
+                yield return new WaitForSeconds(0.1f);
+                clrPress = true;
+            }
+            else
+            {
+                for (int i = 0; i < curr.Length; i++)
+                {
+                    if (i == answer.Length)
+                        break;
+                    if (curr[i] != answer[i])
+                    {
+                        buttons[10].OnInteract();
+                        yield return new WaitForSeconds(0.1f);
+                        clrPress = true;
+                        break;
+                    }
+                }
+            }
+        }
+        int start = 0;
+        if (!clrPress)
+            start = curr.Length;
+        for (int j = start; j < answer.Length; j++)
+        {
+            buttons[int.Parse(answer[j].ToString())].OnInteract();
+            yield return new WaitForSeconds(0.1f);
+        }
+        buttons[11].OnInteract();
     }
 }
