@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text.RegularExpressions;
+using System.Linq;
 using UnityEngine;
 
 public class NtBScript : MonoBehaviour {
@@ -15,7 +15,6 @@ public class NtBScript : MonoBehaviour {
     public Renderer[] brends;
     public Material[] bulbcols;
     public Material[] screwcols;
-    public Color[] lightcols;
     public GameObject[] lights;
     public TextMesh cbtext;
     public AudioClip[] sound;
@@ -29,6 +28,7 @@ public class NtBScript : MonoBehaviour {
     { { 0, 1, 1, 3 }, { 3, 0, 3, 1 }, { 1, 2, 0, 1 }, { 3, 2, 1, 0 }, { 3, 3, 0, 2 }, { 1, 1, 3, 2 }, { 1, 3, 0, 3 }, { 1, 3, 1, 0 }, { 2, 3, 0, 3 }, { 2, 1, 0, 1 }, { 3, 1, 2, 3 }, { 1, 2, 3, 2 }, { 2, 0, 1, 0 }, { 3, 1, 1, 2 }, { 2, 3, 1, 3 }, { 0, 1, 0, 2 }, { 2, 1, 3, 0 }, { 3, 0, 2, 0 }, { 2, 3, 1, 0 }, { 0, 3, 2, 2 }, { 2, 0, 1, 1 }, { 0, 2, 1, 3 }, { 2, 0, 0, 3 }, { 1, 0, 2, 2 }, { 1, 3, 0, 0 }, { 0, 3, 2, 3 } },
     { { 3, 1, 0, 1 }, { 1, 1, 0, 3 }, { 1, 0, 2, 3 }, { 3, 3, 2, 1 }, { 1, 0, 3, 2 }, { 1, 3, 2, 0 }, { 1, 3, 3, 0 }, { 0, 1, 2, 0 }, { 0, 2, 0, 1 }, { 0, 3, 3, 2 }, { 1, 0, 3, 0 }, { 2, 1, 0, 3 }, { 2, 0, 2, 1 }, { 1, 3, 0, 1 }, { 0, 2, 3, 3 }, { 1, 2, 1, 3 }, { 3, 0, 3, 2 }, { 2, 3, 3, 1 }, { 1, 0, 2, 0 }, { 0, 2, 2, 3 }, { 2, 1, 0, 2 }, { 0, 1, 3, 0 }, { 2, 3, 0, 2 }, { 1, 3, 2, 3 }, { 1, 2, 0, 3 }, { 2, 2, 1, 3 } } };
     private readonly string[] wordlist = new string[26] { "AMPLITUDE", "BOULEVARD", "CHEMISTRY", "DUPLICATE", "EIGHTFOLD", "FILAMENTS", "GOLDSMITH", "HARLEQUIN", "INJECTORS", "JUXTAPOSE", "KILOHERTZ", "LABYRINTH", "MOUSTACHE", "NEIGHBOUR", "OBSCURITY", "PENUMBRAL", "QUICKSAND", "RHAPSODIC", "SQUAWKING", "TRIGLYPHS", "UNIVERSAL", "VEXATIONS", "WHIZBANGS", "XENOGLYPH", "YARDSTICK", "ZIGAMORPH" };
+    private readonly Color[] lightcols = new Color[6] { new Color(1, 0, 0), new Color(0, 1, 0), new Color(0, 0, 1), new Color(1, 1, 0), new Color(0.5f, 0, 1), new Color(1, 1, 1)};
     private readonly int[,] wordmods = new int[5, 8] {
     { 0, 6, 7, 4, 5, 3, 1, 2},
     { 0, 5, 1, 6, 2, 4, 7, 3},
@@ -233,10 +233,9 @@ public class NtBScript : MonoBehaviour {
         bulb[0].SetActive(false);
     }
 
-    //twitch plays
-    #pragma warning disable 414
+#pragma warning disable 414
     private readonly string TwitchHelpMessage = @"!{0} <B/I/O> [Presses the bulb, I button, or O button] | !{0} colorblind [Toggles colorblind mode] | Presses can be chained, for ex: !{0} IOOIB";
-    #pragma warning restore 414
+#pragma warning restore 414
     IEnumerator ProcessTwitchCommand(string command)
     {
         if (Regex.IsMatch(command, @"^\s*colorblind\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))

@@ -210,9 +210,9 @@ public class UCFScript : MonoBehaviour {
             case 26: return (x * 10) + ((y + 7) % 10);
             case 27: return (((x + 4) % 10) * 10) + y;
             case 28: return (x * 10) + ((y + (8 - Array.IndexOf(initseq[0][0], 4))) % 10);
-            case 29: return (x * 10) + ((y + (9 - Enumerable.Range(0, 12).Count(q => initseq[1][0][q] == initseq[1][1][q]))) % 10);
+            case 29: return (x * 10) + ((y + (10 - Enumerable.Range(0, 12).Count(q => initseq[1][0][q] == initseq[1][1][q]))) % 10);
             case 30: return (x * 10) + ((y + Array.IndexOf(initseq[0][0], 1) + 1) % 10);
-            case 31: return (((x + (9 - Enumerable.Range(0, 12).Count(q => initseq[1][0][q] == initseq[1][1][q]))) % 10) * 10) + y;
+            case 31: return (((x + (10 - Enumerable.Range(0, 12).Count(q => initseq[1][0][q] == initseq[1][1][q]))) % 10) * 10) + y;
             case 33: return (((x + Array.IndexOf(initseq[0][1], 0) + 1) % 10) * 10) + y;
             case 34: return (x * 10) + ((y + 1) % 10);
             case 35: return (x * 10) + ((y + 5) % 10);

@@ -149,7 +149,7 @@ public class NSCScript : MonoBehaviour {
                 {
                     case 0: return info.GetSerialNumberNumbers().Sum();
                     case 1: return info.GetSerialNumberLetters().First() - 'A' + 1;
-                    default: return string.Join("", info.GetIndicators().ToArray()).Where(k => !" AEIOU".Contains(k)).Select(k => k - 'A' + 1).Min();
+                    default: return info.GetIndicators().Count() == 0 ? 0 : string.Join("", info.GetIndicators().ToArray()).Where(k => !" AEIOU".Contains(k)).Select(k => k - 'A' + 1).Min();
                 }
             case 13:
                 switch (i)
@@ -162,7 +162,7 @@ public class NSCScript : MonoBehaviour {
                 switch (i)
                 {
                     case 0: return info.GetModuleNames().Count() % 25;
-                    case 1: return string.Join("", info.GetIndicators().ToArray()).Select(k => k - 'A' + 1).Max();
+                    case 1: return info.GetIndicators().Count() == 0 ? 0 : string.Join("", info.GetIndicators().ToArray()).Select(k => k - 'A' + 1).Max();
                     default: return (info.GetBatteryCount() - info.GetBatteryHolderCount()) * 5;
                 }
             case 15:
@@ -252,7 +252,7 @@ public class NSCScript : MonoBehaviour {
             case 6:
                 switch (i)
                 {
-                    case 0: return Enumerable.Range(9, 14).Any(k => k == (symnums[6] / 10) + (symnums[6] % 10));
+                    case 0: return Enumerable.Range(9, 14).All(k => k != (symnums[6] / 10) + (symnums[6] % 10));
                     case 1: return Enumerable.Range(3, 3).Select(k => symnums[k]).Any(k => k % 9 == 0);
                     default: return symnums[5] < (symnums[0] * 2) % 100;
                 }
@@ -309,7 +309,7 @@ public class NSCScript : MonoBehaviour {
                 switch (i)
                 {
                     case 0: return primes.Count(k => k >= symnums.Min() && k <= symnums.Where((p, q) => q < 3).Max()) == 4;
-                    case 1: return !Enumerable.Range(7, 11).Any(k => k == (symnums[6] / 10) + (symnums[6] % 10));
+                    case 1: return Enumerable.Range(7, 11).All(k => k != (symnums[6] / 10) + (symnums[6] % 10));
                     default: return Enumerable.Range(0, 3).Select(k => symnums[k]).Count(k => k % 2 == 0) > 1;
                 }
             case 15:
@@ -404,35 +404,41 @@ public class NSCScript : MonoBehaviour {
                 }
         }
         Debug.LogFormat("[Not Symbolic Coordinates #{0}] The truth values of the symbols, after negations are applied, are: {1}", moduleID, string.Join(", ", Enumerable.Range(0, 3).Select(k => (outputs[k, 0] ? "T" : "F") + "|" + (outputs[k, 1] ? "T" : "F")).ToArray()));
+        string[] logops = new string[6];
         for (int i = 0; i < 2; i++)
-            for(int j = 0; j < 2; j++)
+            for (int j = 0; j < 2; j++)
+            {
                 outputs[3 + (i * 2), j] = L(outputs[i, j], outputs[i + 1, j], opkey[(ans[i] * 3) + i + j]);
+                logops[(4 * i) + j] = string.Format("[Not Symbolic Coordinates #{0}] {1} {4}{5} {2} = {3}", moduleID, outputs[i, j] ? "T" : "F", outputs[i + 1, j] ? "T" : "F", outputs[3 + (i * 2), j] ? "T" : "F", new string[] { "\u03b1", "\u03b2", "\u03b3"}[i + j], "LR"[i]);
+            }
         if (info.IsIndicatorPresent(Indicator.CLR))
         {
             if (neg[2])
-            {
-                outputs[4, 0] = L(outputs[0, 0], outputs[2, 0], opkey[(ans[1] * 3) + 2]);
-                outputs[4, 1] = L(outputs[0, 1], outputs[2, 1], opkey[ans[0] * 3]);
+            {               
+                outputs[4, 0] = L(outputs[0, 0], outputs[2, 0], opkey[(ans[0] * 3) + 2]);
+                outputs[4, 1] = L(outputs[0, 1], outputs[2, 1], opkey[ans[1] * 3]);
             }
             else
             {
-                outputs[4, 0] = L(outputs[0, 1], outputs[2, 1], opkey[ans[0] * 3]);
-                outputs[4, 1] = L(outputs[0, 0], outputs[2, 0], opkey[(ans[1] * 3) + 2]);
+                outputs[4, 0] = L(outputs[0, 1], outputs[2, 1], opkey[ans[1] * 3]);
+                outputs[4, 1] = L(outputs[0, 0], outputs[2, 0], opkey[(ans[0] * 3) + 2]);
             }
         }
         else
         {
             if (neg[2])
             {
-                outputs[4, 0] = L(outputs[0, 1], outputs[2, 1], opkey[(ans[1] * 3) + 2]);
-                outputs[4, 1] = L(outputs[0, 0], outputs[2, 0], opkey[ans[0] * 3]);
+                outputs[4, 0] = L(outputs[0, 1], outputs[2, 1], opkey[(ans[0] * 3) + 2]);
+                outputs[4, 1] = L(outputs[0, 0], outputs[2, 0], opkey[ans[1] * 3]);
             }
             else
             {
-                outputs[4, 0] = L(outputs[0, 0], outputs[2, 0], opkey[ans[0] * 3]);
-                outputs[4, 1] = L(outputs[0, 1], outputs[2, 1], opkey[(ans[1] * 3) + 2]);
+                outputs[4, 0] = L(outputs[0, 0], outputs[2, 0], opkey[ans[1] * 3]);
+                outputs[4, 1] = L(outputs[0, 1], outputs[2, 1], opkey[(ans[0] * 3) + 2]);
             }
         }
+        logops[neg[2] ? 2 : 3] = string.Format("[Not Symbolic Coordinates #{0}] {1} {3} {2} = {4}", moduleID, (neg[2] ^ info.IsIndicatorPresent(Indicator.CLR) ? outputs[0, 1] : outputs[0, 0]) ? "T" : "F", (neg[2] ^ info.IsIndicatorPresent(Indicator.CLR) ? outputs[2, 1] : outputs[2, 0]) ? "T" : "F", neg[2] ? "\u03b3" + "L" : "\u03b1" + "R", outputs[4, 0] ? "T" : "F");
+        logops[neg[2] ? 3 : 2] = string.Format("[Not Symbolic Coordinates #{0}] {1} {3} {2} = {4}", moduleID, (neg[2] ^ info.IsIndicatorPresent(Indicator.CLR) ? outputs[0, 0] : outputs[0, 1]) ? "T" : "F", (neg[2] ^ info.IsIndicatorPresent(Indicator.CLR) ? outputs[2, 0] : outputs[2, 1]) ? "T" : "F", neg[2] ? "\u03b1" + "R" : "\u03b3" + "L", outputs[4, 1] ? "T" : "F");
         int batt = info.GetBatteryCount();
         for(int i = 0; i < 4; i++)
         {
@@ -449,26 +455,38 @@ public class NSCScript : MonoBehaviour {
         }
         Debug.LogFormat("[Not Symbolic Coordinates #{0}] The colours of the LEDs are: {1}", moduleID, string.Join(", ", ledcols.Select(k => new string[] { "Green", "Yellow", "Aqua", "Purple"}[k]).ToArray()));
         Debug.LogFormat("[Not Symbolic Coordinates #{0}] The target outputs of the operator sets are: {1}", moduleID, string.Join(", ", Enumerable.Range(3, 3).Select(k => (outputs[k, 0] ? "T" : "F") + "|" + (outputs[k, 1] ? "T" : "F")).ToArray()));
-        for(int i = 0; i < 2; i++)
+        Debug.LogFormat(string.Join("\n", logops));
+        for (int i = 0; i < 2; i++)
         {
             int query = 0;
             bool[] check = Enumerable.Range(3, 3).Select(k => outputs[k, i]).ToArray();
             while(query < functionlists[i].Count())
             {
+                bool[] pass = new bool[2] { false, false };
                 for (int k = 0; k < 2; k++)
                 {
                     for (int j = 0; j < 2; j++)
                         if (check[k * 2] != L(outputs[k, j], outputs[k + 1, j], opkey[(functionlists[i][query] * 3) + k + j]))
                         {
-                            query++;
-                            goto next;
+                            if (pass[0])
+                            {
+                                if (pass[1])
+                                {
+                                    query++;
+                                    goto next;
+                                }
+                                else
+                                    pass[1] = true;
+                            }
+                            else
+                                pass[0] = true;
                         }
                 }
                 if (info.IsIndicatorPresent(Indicator.CLR))
                 {
                     if (neg[2])
                     {
-                        if(check[1] != L(outputs[0, 0], outputs[2, 0], opkey[(functionlists[i][query] * 3) + 2]) && check[1] != L(outputs[0, 1], outputs[2, 1], opkey[functionlists[i][query] * 3]))
+                        if(pass[1] && check[1] != L(outputs[0, 0], outputs[2, 0], opkey[(functionlists[i][query] * 3) + 2]) && check[1] != L(outputs[0, 1], outputs[2, 1], opkey[functionlists[i][query] * 3]))
                         {
                             query++;
                             goto next;
@@ -476,7 +494,7 @@ public class NSCScript : MonoBehaviour {
                     }
                     else
                     {
-                        if(check[1] != L(outputs[0, 1], outputs[2, 1], opkey[functionlists[i][query] * 3]) && check[1] != L(outputs[0, 0], outputs[2, 0], opkey[(functionlists[i][query] * 3) + 2]))
+                        if(pass[1] && check[1] != L(outputs[0, 1], outputs[2, 1], opkey[functionlists[i][query] * 3]) && check[1] != L(outputs[0, 0], outputs[2, 0], opkey[(functionlists[i][query] * 3) + 2]))
                         {
                             query++;
                             goto next;
@@ -487,7 +505,7 @@ public class NSCScript : MonoBehaviour {
                 {
                     if (neg[2])
                     {
-                        if (check[1] != L(outputs[0, 1], outputs[2, 1], opkey[(functionlists[i][query] * 3) + 2]) && check[1] != L(outputs[0, 0], outputs[2, 0], opkey[functionlists[i][query] * 3]))
+                        if (pass[1] && check[1] != L(outputs[0, 1], outputs[2, 1], opkey[(functionlists[i][query] * 3) + 2]) && check[1] != L(outputs[0, 0], outputs[2, 0], opkey[functionlists[i][query] * 3]))
                         {
                             query++;
                             goto next;
@@ -495,7 +513,7 @@ public class NSCScript : MonoBehaviour {
                     }
                     else
                     {
-                        if (check[1] != L(outputs[0, 0], outputs[2, 0], opkey[functionlists[i][query] * 3]) && check[1] != L(outputs[0, 1], outputs[2, 1], opkey[(functionlists[i][query] * 3) + 2]))
+                        if (pass[1] && check[1] != L(outputs[0, 0], outputs[2, 0], opkey[functionlists[i][query] * 3]) && check[1] != L(outputs[0, 1], outputs[2, 1], opkey[(functionlists[i][query] * 3) + 2]))
                         {
                             query++;
                             goto next;

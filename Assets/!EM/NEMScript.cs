@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using System.Linq;
 using UnityEngine;
 using KModkit;
-using System.Text.RegularExpressions;
-using System.Collections;
 
 public class NEMScript : MonoBehaviour {
 
@@ -129,11 +129,9 @@ public class NEMScript : MonoBehaviour {
             ans[0] += ((n / (int)Mathf.Pow(10, 3 - i)) % 10) * (int)Mathf.Pow(10, 3 - order[i]);
         Debug.LogFormat("[Not Emoji Math #{0}] The final code is {1}.", moduleID, ans[0]);
     }
-
-    //twitch plays
-    #pragma warning disable 414
+#pragma warning disable 414
     private readonly string TwitchHelpMessage = @"!{0} submit <code> [Submits the specified code] | Valid codes must be 1-4 digits long";
-    #pragma warning restore 414
+#pragma warning restore 414
     IEnumerator ProcessTwitchCommand(string command)
     {
         string[] parameters = command.Split(' ');

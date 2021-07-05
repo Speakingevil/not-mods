@@ -273,6 +273,7 @@ public class NX01Script : MonoBehaviour {
         }
         else
         {
+            module.HandleStrike();
             play[0] = false;
             for (int i = 0; i < 10; i++)
                 labels[i].text = nums[i].ToString();

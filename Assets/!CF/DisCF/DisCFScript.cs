@@ -6,7 +6,8 @@ using System.Text.RegularExpressions;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-public class DisCFScript : MonoBehaviour {
+public class DisCFScript : MonoBehaviour
+{
 
     public KMAudio Audio;
     public KMBombModule module;
@@ -21,7 +22,7 @@ public class DisCFScript : MonoBehaviour {
     public Material[] patterns;
 
     private readonly int[] fontsizes = new int[9] { 29, 34, 24, 31, 20, 33, 33, 48, 22 };
-    private readonly Vector3[] sympos = new Vector3[9] { new Vector3(-0.016f, 0.0125f, -0.016f), new Vector3(0, 0.0125f, -0.016f), new Vector3(0.016f, 0.0125f, -0.016f), new Vector3(-0.016f, 0.0125f, 0), new Vector3(0, 0.0125f, 0), new Vector3(0.016f, 0.0125f, 0), new Vector3(-0.016f, 0.0125f, 0.016f), new Vector3(0, 0.0125f, 0.016f), new Vector3(0.016f, 0.0125f, 0.016f) };
+    private readonly Vector3[] sympos = new Vector3[9] { new Vector3(-0.016f, 0.0125f, 0.016f), new Vector3(0, 0.0125f, 0.016f), new Vector3(0.016f, 0.0125f, 0.016f), new Vector3(-0.016f, 0.0125f, 0), new Vector3(0, 0.0125f, 0), new Vector3(0.016f, 0.0125f, 0), new Vector3(-0.016f, 0.0125f, -0.016f), new Vector3(0, 0.0125f, -0.016f), new Vector3(0.016f, 0.0125f, -0.016f) };
     private readonly int[][] triplets = new int[21][]
     {
         new int[3]{ 0, 0, 0}, new int[3]{ 1, 1, 1}, new int[3]{ 2, 2, 2}, new int[3]{ 3, 3, 3}, new int[3]{ 4, 4, 4}, new int[3]{ 5, 5, 5}, new int[3]{ 6, 6, 6}, new int[3]{ 7, 7, 7}, new int[3]{ 8, 8, 8},
@@ -54,7 +55,7 @@ public class DisCFScript : MonoBehaviour {
         {"NERO", "ROSSO", "VERDE", "BLU", "GRIGIO", "TURCHESE", "ROSA", "GIALLO", "BIANCO"}
     };
     private readonly Color[][] cols = new Color[2][]
-    {       
+    {
         new Color[9]{ new Color(0, 1, 1), new Color(1, 0, 1), new Color(1, 1, 1), new Color(1, 1, 0), new Color(0.65f, 0.65f, 0.65f), new Color(1, 0, 0), new Color(0.25f, 0.25f, 0.25f), new Color(0, 1, 0), new Color(0, 0, 1)},
         new Color[9]{ new Color(0.25f, 0.25f, 0.25f), new Color(0.65f, 0.65f, 0.65f), new Color(1, 1, 1), new Color(1, 0.5f, 0), new Color(0.5f, 1, 0), new Color(0, 1, 0.5f), new Color(0, 0.5f, 1), new Color(0.5f, 0, 1), new Color(1, 0, 0.5f)}
     };
@@ -105,7 +106,7 @@ public class DisCFScript : MonoBehaviour {
         {
             disptext[i] = "('[*~:{ <"[dispinfo[i, 8]] + langdisps[dispinfo[i, 2], dispinfo[i, 0]] + ")']*~:} >"[dispinfo[i, 8]];
             string[] t = Enumerable.Range(0, 9).Select(x => loginfo[x + 1][dispinfo[i, x]]).ToArray();
-            f[i] = string.Format("{2} in {3}, written in {4}, coloured {5}, and contained in {6} with a {7} {8} pattern and a {9} in the {10} position.", moduleID, loginfo[0][i], t[0], t[2], t[4], t[1], t[8], t[5], t[3], t[6], t[7]);               
+            f[i] = string.Format("{2} in {3}, written in {4}, coloured {5}, and contained in {6} with a {7} {8} pattern and a {9} in the {10} position.", moduleID, loginfo[0][i], t[0], t[2], t[4], t[1], t[8], t[5], t[3], t[6], t[7]);
         }
         for (int i = 0; i < 9; i++)
             Debug.LogFormat("[Discolour Flash #{0}] The {1} display is: {2}", moduleID, loginfo[0][i], f[order[i]]);
@@ -133,7 +134,8 @@ public class DisCFScript : MonoBehaviour {
             if (y)
             {
                 disp.fontStyle = FontStyle.Italic;
-                if (!selection.Contains(order[screen])) {
+                if (!selection.Contains(order[screen]))
+                {
                     for (int i = 0; i < 3; i++)
                         if (selection[i] < 0)
                         {
@@ -152,7 +154,7 @@ public class DisCFScript : MonoBehaviour {
                             StopCoroutine("Seq");
                             if (TwitchPlaysActive)
                                 tptext.text = "";
-                            disp.text = langdisps[0, Array.IndexOf(order, screen)];
+                            disp.text = langdisps[0, dispinfo[order[screen], 0]];
                             disp.fontSize = 48;
                             disp.font = fonts[7];
                             disp.GetComponent<Renderer>().material = fontmats[7];
@@ -183,8 +185,6 @@ public class DisCFScript : MonoBehaviour {
         {
             int a = order[screen];
             int[] f = Enumerable.Range(0, 9).Select(x => dispinfo[a, x]).ToArray();
-            if (TwitchPlaysActive)
-                tptext.text = (screen + 1).ToString();
             disp.text = disptext[a];
             disp.color = cols[0][f[1]];
             disp.font = fonts[f[4]];
@@ -199,17 +199,25 @@ public class DisCFScript : MonoBehaviour {
             else
                 disp.fontStyle = FontStyle.Normal;
             yield return new WaitForSeconds(1.1f);
+            if (TwitchPlaysActive)
+            {
+                tptext.text = (screen + 1).ToString();
+                tptext.color = new Color(1, 1, 1);
+                tptext.font = fonts[7];
+                tptext.GetComponent<Renderer>().material = fontmats[7];
+                tptext.fontSize = 60;
+                yield return new WaitForSeconds(0.3f);
+            }
             screen++;
             screen %= 9;
         }
     }
 
-    //twitch plays
     bool TwitchPlaysActive;
     bool TPHighlightActive;
-    #pragma warning disable 414
-    private readonly string TwitchHelpMessage = @"!{0} highlight <yes/no> <1-20> [Highlights the specified button for 1-20 seconds] | !{0} press yes <#> (#₂)... [Presses the Yes button on display '#' (optionally also '#₂' or more)] | !{0} press no [Presses the No button]";
-    #pragma warning restore 414
+#pragma warning disable 414
+    private readonly string TwitchHelpMessage = @"!{0} highlight <yes/no> <1-20> [Highlights the specified button for 1-20 seconds] | !{0} press yes <#> (#₂)... [Presses the Yes button on display '#' (optionally also '#₂' or more) (the number of the display is shown after the display itself.)] | !{0} press no [Presses the No button]";
+#pragma warning restore 414
     IEnumerator ProcessTwitchCommand(string command)
     {
         string[] parameters = command.Split(' ');
@@ -283,7 +291,7 @@ public class DisCFScript : MonoBehaviour {
                     }
                     if (temp < 1 || temp > 9)
                     {
-                        yield return "sendtochaterror The specified display to press the yes button at '" + parameters[i] + "' is out of range 1-9!";
+                        yield return "sendtochaterror The specified display to press the yes button at '" + parameters[i] + "' is out of the range 1-9!";
                         yield break;
                     }
                     if (presses.Contains(temp) || selection.Contains(temp))
@@ -333,7 +341,7 @@ public class DisCFScript : MonoBehaviour {
             }
             else if (parameters.Length == 1)
             {
-                yield return "sendtochaterror Please specify what button press and at least one display if you wish to press the yes button!";
+                yield return "sendtochaterror Please specify what button to press and at least one display if you wish to press the yes button!";
             }
             yield break;
         }
