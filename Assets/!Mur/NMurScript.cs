@@ -327,6 +327,7 @@ public class NMurScript : MonoBehaviour {
                     {
                         yield return null;
                         buttons[i * 2].OnInteract();
+                        yield return new WaitForSeconds(0.1f);
                     }
                 }
             }
@@ -347,14 +348,17 @@ public class NMurScript : MonoBehaviour {
             {
                 yield return null;
                 buttons[5].OnInteract();
+                yield return new WaitForSeconds(0.1f);
             }
             while (turns[5][selection[0]][1] != dispinfo[1][selection[1]])
             {
                 yield return null;
                 buttons[3].OnInteract();
+                yield return new WaitForSeconds(0.1f);
             }
             yield return null;
             buttons[6].OnInteract();
+            yield return new WaitForSeconds(0.1f);
         }
     }
 }

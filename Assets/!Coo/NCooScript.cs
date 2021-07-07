@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -136,14 +137,14 @@ public class NCooScript : MonoBehaviour {
         int[] alt;
         while (true)
         {          
-            tverts[0][0] = Random.Range(1, 8);
-            tverts[0][1] = Random.Range(1, 8);
-            tverts[1][0] = Random.Range(1, 8);
-            tverts[1][1] = Random.Range(1, 8);
+            tverts[0][0] = UnityEngine.Random.Range(1, 8);
+            tverts[0][1] = UnityEngine.Random.Range(1, 8);
+            tverts[1][0] = UnityEngine.Random.Range(1, 8);
+            tverts[1][1] = UnityEngine.Random.Range(1, 8);
             while (tverts[0][0] == tverts[1][0] && tverts[0][1] == tverts[1][1])
             {
-                tverts[0][0] = Random.Range(1, 8);
-                tverts[0][1] = Random.Range(1, 8);
+                tverts[0][0] = UnityEngine.Random.Range(1, 8);
+                tverts[0][1] = UnityEngine.Random.Range(1, 8);
             }
             alt = Enumerable.Range(0, 81).Select(x => new int[] { x / 9, x % 9 }).Where(x => !Colinear(x, tverts[0], tverts[1]) && IsoRight(x, tverts[0], tverts[1])).Select(x => x[0] * 9 + x[1]).ToArray();
             if (alt.Length > 2)
@@ -161,7 +162,7 @@ public class NCooScript : MonoBehaviour {
         int pick = 0;
         while (true)
         {
-            pick = Random.Range(0, alt.Length);
+            pick = UnityEngine.Random.Range(0, alt.Length);
             int[] acoord = new int[2] { alt[pick] / 9, alt[pick] % 9 };
             int[] centre = new int[2] { -1, 0 };
             for (int i = 0; i < 18; i++)
@@ -223,9 +224,9 @@ public class NCooScript : MonoBehaviour {
             }
             if (Enumerable.Range(0, 81).All(x => openspace[x / 9, x % 9] == true))
                 break;
-            int t = Random.Range(0, 81);
+            int t = UnityEngine.Random.Range(0, 81);
             while (openspace[t / 9, t % 9])
-                t = Random.Range(0, 81);
+                t = UnityEngine.Random.Range(0, 81);
             vertices[t / 9, t % 9] = true;
             seq[0].Add(t);
             openspace[t / 9, t % 9] = true;
@@ -238,7 +239,7 @@ public class NCooScript : MonoBehaviour {
         seq[1].Shuffle();
         for (int i = 0; i < seq[1].Count(); i++)
         {
-            int x = Random.Range(0, i == 0 ? 11 : 14);
+            int x = UnityEngine.Random.Range(0, i == 0 ? 11 : 14);
             disp.Add(Rewrite(seq[1][i], x));
         }
         disptext.text = disp[0];
@@ -328,8 +329,8 @@ public class NCooScript : MonoBehaviour {
                             dir = new int[] { 0, 1, 2, 3 }.Shuffle();
                             for (int i = 0; i < 4; i++)
                             {
-                                pos[i] = Random.Range(0, 3);
-                                back[i] = Random.Range(0, 2) == 1;
+                                pos[i] = UnityEngine.Random.Range(0, 3);
+                                back[i] = UnityEngine.Random.Range(0, 2) == 1;
                                 Debug.LogFormat("[Not Coordinates #{0}] Pressing {1} on an {2} second moves {3}{4}", moduleID, new string[] { "left", "right"}[i / 2], new string[] { "even", "odd"}[i % 2], new string[] { "large", "small"}[dir[i] / 2], new string[] { "down", "right", "up", "left"}[dir[i] % 2 + (back[i] ? 2 : 0)]);
                             }
                             Debug.Log(string.Join(", ", dir.Select(x => (x + 1).ToString()).ToArray()));
@@ -426,14 +427,14 @@ public class NCooScript : MonoBehaviour {
         while (glitching[i])
         {
             yield return new WaitForSeconds(0.1f);
-            screen[i + 1].material = shapes[Random.Range(0, 9)];
+            screen[i + 1].material = shapes[UnityEngine.Random.Range(0, 9)];
         }
         int shape = dogrid[(pos[0] * 3) + pos[2], (pos[1] * 3) + pos[3]];
         screen[i + 1].material = shapes[i == 0 ? shape / 10 : shape % 10];
     }
 
 #pragma warning disable 414
-    private readonly string TwitchHelpMessage = "Phase 1: !{0} left/submit/right [l/m/r can be used as ahorthands] !{0} cycle | !{0} <display> [Cycles to display] | Phase 2: !{0} left/right even/odd | !{0} submit";
+    private readonly string TwitchHelpMessage = "Phase 1: !{0} left/submit/right [l/m/r can be used as ahorthands] | !{0} cycle | !{0} <display> [Cycles to display] | Phase 2: !{0} left/right even/odd | !{0} submit";
 #pragma warning restore 414
 
     private IEnumerator ProcessTwitchCommand(string command)
@@ -519,5 +520,132 @@ public class NCooScript : MonoBehaviour {
             else
                 yield return "sendtochaterror!f Invalid command: " + command;
         }
+    }
+
+    IEnumerator TwitchHandleForcedSolve()
+    {
+        if (gud.Any(x => x == false))
+        {
+            while (anim)
+                yield return true;
+            int ct = gud.Count(x => x == false);
+            for (int i = 0; i < ct; i++)
+            {
+                int leftInd = pos[0];
+                int rightInd = pos[0];
+                int leftCt = 0;
+                int rightCt = 0;
+                while (seq[0].IndexOf(seq[1][leftInd]) >= 3 || gud[seq[0].IndexOf(seq[1][leftInd])])
+                {
+                    leftInd--;
+                    if (leftInd < 0)
+                        leftInd = disp.Count - 1;
+                    leftCt++;
+                }
+                while (seq[0].IndexOf(seq[1][rightInd]) >= 3 || gud[seq[0].IndexOf(seq[1][rightInd])])
+                {
+                    rightInd++;
+                    if (rightInd > (disp.Count - 1))
+                        rightInd = 0;
+                    rightCt++;
+                }
+                if (leftCt < rightCt)
+                {
+                    for (int j = 0; j < leftCt; j++)
+                    {
+                        buttons[0].OnInteract();
+                        while (anim)
+                            yield return true;
+                    }
+                }
+                else if (rightCt < leftCt)
+                {
+                    for (int j = 0; j < rightCt; j++)
+                    {
+                        buttons[2].OnInteract();
+                        while (anim)
+                            yield return true;
+                    }
+                }
+                else if (leftCt == rightCt)
+                {
+                    int choice = UnityEngine.Random.Range(0, 2);
+                    for (int j = 0; j < (choice == 0 ? leftCt : rightCt); j++)
+                    {
+                        buttons[choice == 0 ? 0 : 2].OnInteract();
+                        while (anim)
+                            yield return true;
+                    }
+                }
+                buttons[1].OnInteract();
+                while (anim)
+                    yield return true;
+            }
+        }
+        var q = new Queue<int[]>();
+        var allMoves = new List<Movement>();
+        var startPoint = new int[] { pos[0], pos[1], pos[2], pos[3] };
+        var target = new int[] { -1, -1, -1, -1 };
+        q.Enqueue(startPoint);
+        while (q.Count > 0)
+        {
+            var next = q.Dequeue();
+            if (((next[0] * 3) + next[2]) * 9 + (next[1] * 3) + next[3] == targetshape)
+            {
+                for (int i = 0; i < 4; i++)
+                    target[i] = next[i];
+                goto readyToSubmit;
+            }
+            List<int[]> options = new List<int[]>();
+            for (int i = 0; i < 4; i++)
+            {
+                int[] temp = { next[0], next[1], next[2], next[3] };
+                temp[dir[i]] += back[i] ? 2 : 1; temp[dir[i]] %= 3;
+                options.Add(temp);
+            }
+            for (int i = 0; i < 4; i++)
+            {
+                if (!allMoves.Any(x => x.start[0] == options[i][0] && x.start[1] == options[i][1] && x.start[2] == options[i][2] && x.start[3] == options[i][3]))
+                {
+                    q.Enqueue(options[i]);
+                    if (i == 0)
+                        allMoves.Add(new Movement { start = next, end = options[i], btn = 0, even = true });
+                    else if (i == 1)
+                        allMoves.Add(new Movement { start = next, end = options[i], btn = 0, even = false });
+                    else if (i == 2)
+                        allMoves.Add(new Movement { start = next, end = options[i], btn = 2, even = true });
+                    else if (i == 3)
+                        allMoves.Add(new Movement { start = next, end = options[i], btn = 2, even = false });
+                }
+            }
+        }
+        throw new InvalidOperationException("There is a bug in the TP autosolver." + moduleID);
+        readyToSubmit:
+        if (allMoves.Count != 0) // Checks for position already being target
+        {
+            var lastMove = allMoves.First(x => x.end[0] == target[0] && x.end[1] == target[1] && x.end[2] == target[2] && x.end[3] == target[3]);
+            var relevantMoves = new List<Movement> { lastMove };
+            while (lastMove.start != startPoint)
+            {
+                lastMove = allMoves.First(x => x.end[0] == lastMove.start[0] && x.end[1] == lastMove.start[1] && x.end[2] == lastMove.start[2] && x.end[3] == lastMove.start[3]);
+                relevantMoves.Add(lastMove);
+            }
+            for (int i = 0; i < relevantMoves.Count; i++)
+            {
+                while ((int)info.GetTime() % 2 != (relevantMoves[relevantMoves.Count - 1 - i].even ? 0 : 1)) { yield return true; }
+                buttons[relevantMoves[relevantMoves.Count - 1 - i].btn].OnInteract();
+                while (anim)
+                    yield return true;
+            }
+        }
+        buttons[1].OnInteract();
+    }
+
+    class Movement
+    {
+        public int[] start;
+        public int[] end;
+        public int btn;
+        public bool even;
     }
 }

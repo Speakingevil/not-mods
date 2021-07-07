@@ -497,6 +497,7 @@ public class NMorScript : MonoBehaviour {
                 {
                     yield return null;
                     tbuttons["IJZTOSL".IndexOf(commands[1][i].ToString())].OnInteract();
+                    yield return new WaitForSeconds(0.05f);
                 }
                 yield return null;
                 yield return "solve";
@@ -517,12 +518,12 @@ public class NMorScript : MonoBehaviour {
             tsubmit.OnInteract();
         }
         while (submission[0])
-            yield return true;
-        StopCoroutine("Countdown");
+            yield return null;
         for(int i = 0; i < 8; i++)
         {
             yield return null;
             tbuttons[answer[0][i]].OnInteract();
+            yield return new WaitForSeconds(0.05f);
         }
         yield return null;
         tsubmit.OnInteract();

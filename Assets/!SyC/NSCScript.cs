@@ -1,10 +1,11 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using KModkit;
 using Random = UnityEngine.Random;
+using System.Text.RegularExpressions;
+using System.Collections;
 
 public class NSCScript : MonoBehaviour {
 
@@ -569,5 +570,148 @@ public class NSCScript : MonoBehaviour {
                 displays[(b / 2) + 1].text = "0123456789ABCDEFGHIJ"[functions[b / 2][selected[b / 2]]].ToString();
             }
         }
+    }
+
+    //twitch plays
+#pragma warning disable 414
+    private readonly string TwitchHelpMessage = @"!{0} cycle (left/l/right/r) [Cycles through the left and right sets (optionally cycle through only one set)] | !{0} submit <set1><set2> [Submits the specified set pair]";
+#pragma warning restore 414
+    IEnumerator ProcessTwitchCommand(string command)
+    {
+        string[] parameters = command.Split(' ');
+        if (Regex.IsMatch(parameters[0], @"^\s*cycle\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
+        {
+            yield return null;
+            if (parameters.Length > 2)
+            {
+                yield return "sendtochaterror Too many parameters!";
+            }
+            else if (parameters.Length == 2)
+            {
+                if (!parameters[1].ToLower().EqualsAny("left", "l", "right", "r"))
+                {
+                    yield return "sendtochaterror!f The specified set '" + parameters[1] + "' is invalid!";
+                    yield break;
+                }
+                string[] first = functions[0].Select(k => "0123456789ABCDEFGHIJ"[k].ToString()).ToArray();
+                string[] second = functions[1].Select(k => "0123456789ABCDEFGHIJ"[k].ToString()).ToArray();
+                if (parameters[1].ToLower().EqualsAny("left", "l"))
+                {
+                    for (int i = 0; i < first.Length; i++)
+                    {
+                        yield return "trycancel";
+                        if (i != 0)
+                            yield return new WaitForSeconds(1f);
+                        buttons[0].OnInteract();
+                    }
+                }
+                else
+                {
+                    for (int i = 0; i < second.Length; i++)
+                    {
+                        yield return "trycancel";
+                        if (i != 0)
+                            yield return new WaitForSeconds(1f);
+                        buttons[2].OnInteract();
+                    }
+                }
+            }
+            if (parameters.Length == 1)
+            {
+                string[] first = functions[0].Select(k => "0123456789ABCDEFGHIJ"[k].ToString()).ToArray();
+                string[] second = functions[1].Select(k => "0123456789ABCDEFGHIJ"[k].ToString()).ToArray();
+                for (int i = 0; i < first.Length; i++)
+                {
+                    yield return "trycancel";
+                    if (i != 0)
+                        yield return new WaitForSeconds(1f);
+                    buttons[0].OnInteract();
+                }
+                for (int i = 0; i < second.Length; i++)
+                {
+                    yield return "trycancel";
+                    yield return new WaitForSeconds(1f);
+                    buttons[2].OnInteract();
+                }
+            }
+            yield break;
+        }
+        if (Regex.IsMatch(parameters[0], @"^\s*submit\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
+        {
+            yield return null;
+            if (parameters.Length > 2)
+            {
+                yield return "sendtochaterror Too many parameters!";
+            }
+            else if (parameters.Length == 2)
+            {
+                string[] first = functions[0].Select(k => "0123456789ABCDEFGHIJ"[k].ToString()).ToArray();
+                string[] second = functions[1].Select(k => "0123456789ABCDEFGHIJ"[k].ToString()).ToArray();
+                string firSet = parameters[1][0].ToString().ToUpper();
+                string secSet = parameters[1][1].ToString().ToUpper();
+                if (!"0123456789ABCDEFGHIJ".Contains(firSet[0]))
+                {
+                    yield return "sendtochaterror!f The specified set '" + parameters[1][0] + "' is invalid!";
+                    yield break;
+                }
+                if (!"0123456789ABCDEFGHIJ".Contains(secSet[0]))
+                {
+                    yield return "sendtochaterror!f The specified set '" + parameters[1][1] + "' is invalid!";
+                    yield break;
+                }
+                if (!first.Contains(firSet))
+                {
+                    for (int i = 0; i < first.Length; i++)
+                    {
+                        buttons[0].OnInteract();
+                        yield return new WaitForSeconds(0.1f);
+                    }
+                    yield return "sendtochaterror The specified set '" + parameters[1][0] + "' is not an option for the left display!";
+                    yield return "unsubmittablepenalty";
+                    yield break;
+                }
+                if (!second.Contains(secSet))
+                {
+                    for (int i = 0; i < second.Length; i++)
+                    {
+                        buttons[2].OnInteract();
+                        yield return new WaitForSeconds(0.1f);
+                    }
+                    yield return "sendtochaterror The specified set '" + parameters[1][1] + "' is not an option for the right display!";
+                    yield return "unsubmittablepenalty";
+                    yield break;
+                }
+                for (int j = 0; j < 2; j++)
+                {
+                    int diff = (j == 0 ? Array.IndexOf(first, firSet) : Array.IndexOf(second, secSet)) - selected[j];
+                    if (Math.Abs(diff) > (j == 0 ? first.Length : second.Length) / 2)
+                    {
+                        diff = Math.Abs(diff) - (j == 0 ? first.Length : second.Length);
+
+                        if ((j == 0 ? Array.IndexOf(first, firSet) : Array.IndexOf(second, secSet)) < selected[j])
+                            diff = -diff;
+                    }
+                    for (int i = 0; i < Math.Abs(diff); i++)
+                    {
+                        if (diff > 0)
+                            buttons[j == 0 ? 0 : 2].OnInteract();
+                        else
+                            buttons[j == 0 ? 1 : 3].OnInteract();
+                        yield return new WaitForSeconds(0.1f);
+                    }
+                }
+                buttons[4].OnInteract();
+            }
+            else if (parameters.Length == 1)
+            {
+                yield return "sendtochaterror Please specify the set pair to submit!";
+            }
+            yield break;
+        }
+    }
+
+    IEnumerator TwitchHandleForcedSolve()
+    {
+        yield return ProcessTwitchCommand("submit " + "0123456789ABCDEFGHIJ"[ans[0]] + "0123456789ABCDEFGHIJ"[ans[1]]);
     }
 }

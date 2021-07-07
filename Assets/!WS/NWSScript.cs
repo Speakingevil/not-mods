@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using UnityEngine;
 
 public class NWSScript : MonoBehaviour {
@@ -171,6 +172,64 @@ public class NWSScript : MonoBehaviour {
             foreach (GameObject g in hlrings)
                 g.transform.Rotate(180, 0, 0);
             yield return new WaitForSeconds(0.4f);
+        }
+    }
+
+    //twitch plays
+#pragma warning disable 414
+    private readonly string TwitchHelpMessage = @"!{0} select <coord> (coord2)... [Selects the letter at the specified coordinate (optionally include multiple coordinates)] | Valid coordinates are A1-F6";
+#pragma warning restore 414
+    IEnumerator ProcessTwitchCommand(string command)
+    {
+        string[] parameters = command.Split(' ');
+        if (Regex.IsMatch(parameters[0], @"^\s*select\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
+        {
+            yield return null;
+            if (parameters.Length > 1)
+            {
+                for (int i = 1; i < parameters.Length; i++)
+                {
+                    if (parameters[i].Length != 2)
+                    {
+                        yield return "sendtochaterror The specified coordinate '" + parameters[i] + "' is invalid!";
+                        yield break;
+                    }
+                    if (!parameters[i][0].ToString().ToUpper().EqualsAny("A", "B", "C", "D", "E", "F") || !parameters[i][1].ToString().EqualsAny("1", "2", "3", "4", "5", "6"))
+                    {
+                        yield return "sendtochaterror The specified coordinate '" + parameters[i] + "' is invalid!";
+                        yield break;
+                    }
+                }
+                for (int i = 1; i < parameters.Length; i++)
+                {
+                    int btn = "123456".IndexOf(parameters[i][1].ToString().ToUpper()) * 6 + "ABCDEF".IndexOf(parameters[i][0].ToString().ToUpper());
+                    buttons[btn].OnInteract();
+                    yield return new WaitForSeconds(0.1f);
+                }
+            }
+            else if (parameters.Length == 1)
+            {
+                yield return "sendtochaterror Please specify at least one coordinate of a letter to press!";
+            }
+            yield break;
+        }
+    }
+
+    IEnumerator TwitchHandleForcedSolve()
+    {
+        while (buttons[0].OnInteract == null)
+            yield return true;
+        int start = anscount;
+        for (int i = start; i < 12; i++)
+        {
+            for (int j = 0; j < 36; j++)
+            {
+                if (grid[j].ToString().Equals(ans[i]) && !selected[j])
+                {
+                    buttons[j].OnInteract();
+                    yield return new WaitForSeconds(0.1f);
+                }
+            }
         }
     }
 }

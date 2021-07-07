@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -350,6 +351,156 @@ public class UCFScript : MonoBehaviour {
                     StartCoroutine("Colcycle");
                 }
             }
+        }
+    }
+
+    //twitch plays
+#pragma warning disable 414
+    private readonly string TwitchHelpMessage = @"!{0} press yes [Presses the Yes button] | !{0} press no [Presses the No button] | !{0} sequence/seq <colour> [Displays the sequence for the specified colour] | !{0} submit <colour> <#> [Submits the specified colour and '#'th word in that colour's sequence (1-12)]";
+#pragma warning restore 414
+    IEnumerator ProcessTwitchCommand(string command)
+    {
+        string[] parameters = command.Split(' ');
+        if (Regex.IsMatch(parameters[0], @"^\s*press\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
+        {
+            yield return null;
+            if (parameters.Length > 2)
+            {
+                yield return "sendtochaterror Too many parameters!";
+            }
+            else if (parameters.Length == 2)
+            {
+                if (!parameters[1].EqualsIgnoreCase("no") && !parameters[1].EqualsIgnoreCase("yes"))
+                {
+                    yield return "sendtochaterror!f The specified button to press '" + parameters[1] + "' is invalid!";
+                    yield break;
+                }
+                if (parameters[1].EqualsIgnoreCase("yes"))
+                    buttons[0].OnInteract();
+                else
+                    buttons[1].OnInteract();
+            }
+            else if (parameters.Length == 1)
+            {
+                yield return "sendtochaterror Please specify what button to press!";
+            }
+            yield break;
+        }
+        if (Regex.IsMatch(parameters[0], @"^\s*sequence\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant) || Regex.IsMatch(parameters[0], @"^\s*seq\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
+        {
+            yield return null;
+            if (parameters.Length > 2)
+            {
+                yield return "sendtochaterror Too many parameters!";
+            }
+            else if (parameters.Length == 2)
+            {
+                if (!coldisps.Contains(parameters[1].ToUpper()))
+                {
+                    yield return "sendtochaterror!f The specified colour '" + parameters[1] + "' is invalid!";
+                    yield break;
+                }
+                buttons[0].OnInteract();
+                yield return new WaitForSeconds(0.1f);
+                while (sub[0] != Array.IndexOf(coldisps, parameters[1].ToUpper()))
+                    yield return "trycancel";
+                buttons[1].OnInteract();
+            }
+            else if (parameters.Length == 1)
+            {
+                yield return "sendtochaterror Please specify what colour sequence to display!";
+            }
+            yield break;
+        }
+        if (Regex.IsMatch(parameters[0], @"^\s*submit\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
+        {
+            yield return null;
+            if (parameters.Length > 3)
+            {
+                yield return "sendtochaterror Too many parameters!";
+            }
+            else if (parameters.Length == 3)
+            {
+                if (!coldisps.Contains(parameters[1].ToUpper()))
+                {
+                    yield return "sendtochaterror!f The specified colour to submit '" + parameters[1] + "' is invalid!";
+                    yield break;
+                }
+                int temp = -1;
+                if (!int.TryParse(parameters[2], out temp))
+                {
+                    yield return "sendtochaterror!f The specified number '" + parameters[2] + "' is invalid!";
+                    yield break;
+                }
+                if (temp < 1 || temp > 12)
+                {
+                    yield return "sendtochaterror The specified number '" + parameters[2] + "' is out of range 1-12!";
+                    yield break;
+                }
+                buttons[0].OnInteract();
+                yield return new WaitForSeconds(0.1f);
+                while (sub[0] != Array.IndexOf(coldisps, parameters[1].ToUpper()))
+                    yield return "trycancel";
+                buttons[1].OnInteract();
+                yield return new WaitForSeconds(0.1f);
+                while (sub[1] != (temp - 1))
+                    yield return "trycancel";
+                buttons[0].OnInteract();
+            }
+            else if (parameters.Length == 2)
+            {
+                if (coldisps.Contains(parameters[1].ToUpper()))
+                    yield return "sendtochaterror Please specify what word to submit!";
+                else
+                    yield return "sendtochaterror!f The specified colour to submit '" + parameters[1] + "' is invalid!";
+            }
+            else if (parameters.Length == 1)
+            {
+                yield return "sendtochaterror Please specify what word and colour to submit!";
+            }
+            yield break;
+        }
+    }
+
+    IEnumerator TwitchHandleForcedSolve()
+    {
+        while (!play[0] && play[1])
+            yield return true;
+        if (play[0] && !play[1])
+        {
+            if (Array.IndexOf(initseq[0][1], sub[0]) > Array.IndexOf(initseq[0][1], tarseq[stage]))
+            {
+                while (play[0] && !play[1])
+                    yield return true;
+            }
+        }
+        else if (play[0] && play[1])
+        {
+            if (sub[1] > accept[sub[0]].Max())
+            {
+                while (play[0] && play[1])
+                    yield return true;
+            }
+        }
+        int start = stage;
+        for (int i = start; i < 3; i++)
+        {
+            if (!play[0] && !play[1])
+            {
+                buttons[0].OnInteract();
+                yield return new WaitForSeconds(0.1f);
+            }
+            if (play[0] && !play[1])
+            {
+                while (sub[0] != tarseq[i])
+                    yield return null;
+                buttons[1].OnInteract();
+                yield return new WaitForSeconds(0.1f);
+            }
+            while (!accept[sub[0]].Contains(sub[1]))
+                yield return null;
+            buttons[0].OnInteract();
+            yield return new WaitForSeconds(0.1f);
         }
     }
 }

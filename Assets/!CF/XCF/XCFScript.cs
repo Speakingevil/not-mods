@@ -812,10 +812,11 @@ public class XCFScript : MonoBehaviour
                         else
                             b = 1;
                     }
-                    valid = (int)info.GetTime() % 10 == finalvals[3];
+                    valid = ((int)info.GetTime() % 10) == finalvals[3];
                     break;
             }
-            yield return true;
+            if (!valid)
+                yield return true;
         }
         buttons[b].OnInteract();
     }

@@ -129,6 +129,8 @@ public class NEMScript : MonoBehaviour {
             ans[0] += ((n / (int)Mathf.Pow(10, 3 - i)) % 10) * (int)Mathf.Pow(10, 3 - order[i]);
         Debug.LogFormat("[Not Emoji Math #{0}] The final code is {1}.", moduleID, ans[0]);
     }
+
+    //twitch plays
 #pragma warning disable 414
     private readonly string TwitchHelpMessage = @"!{0} submit <code> [Submits the specified code] | Valid codes must be 1-4 digits long";
 #pragma warning restore 414
@@ -175,7 +177,7 @@ public class NEMScript : MonoBehaviour {
         bool clrPress = false;
         string curr = "";
         string answer = ans[0].ToString();
-        if (display.text != d)
+        if (display.text != d && display.text != "0")
         {
             curr = display.text;
             if (curr.Length > answer.Length)
