@@ -145,7 +145,7 @@ public class DisCFScript : MonoBehaviour
                     if (selection.All(x => x >= 0))
                     {
                         int[] s = selection.Select(x => Array.IndexOf(order, x) + 1).OrderBy(x => x).ToArray();
-                        Debug.LogFormat("[Discolour Flash {0}] Submitted displays {1}, {2}, and {3}.", moduleID, s[0], s[1], s[2]);
+                        Debug.LogFormat("[Discolour Flash #{0}] Submitted displays {1}, {2}, and {3}.", moduleID, s[0], s[1], s[2]);
                         if (selection.OrderBy(x => x).SequenceEqual(new int[] { 0, 1, 2 }))
                         {
                             moduleSolved = true;
@@ -213,10 +213,11 @@ public class DisCFScript : MonoBehaviour
         }
     }
 
+    //twitch plays
     bool TwitchPlaysActive;
     bool TPHighlightActive;
 #pragma warning disable 414
-    private readonly string TwitchHelpMessage = @"!{0} highlight <yes/no> <1-20> [Highlights the specified button for 1-20 seconds] | !{0} press yes <#> (#₂)... [Presses the Yes button on display '#' (optionally also '#₂' or more) (the number of the display is shown after the display itself.)] | !{0} press no [Presses the No button]";
+    private readonly string TwitchHelpMessage = @"!{0} highlight <yes/no> [Highlights the specified button until each symbol or pattern has shown once] | !{0} press yes <#> (#₂)... [Presses the Yes button on display '#' (optionally also '#₂' or more, the number of the display is shown after the display itself)] | !{0} press no [Presses the No button]";
 #pragma warning restore 414
     IEnumerator ProcessTwitchCommand(string command)
     {
@@ -224,26 +225,15 @@ public class DisCFScript : MonoBehaviour
         if (Regex.IsMatch(parameters[0], @"^\s*highlight\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
         {
             yield return null;
-            if (parameters.Length > 3)
+            if (parameters.Length > 2)
             {
                 yield return "sendtochaterror Too many parameters!";
             }
-            else if (parameters.Length == 3)
+            else if (parameters.Length == 2)
             {
                 if (!parameters[1].EqualsIgnoreCase("yes") && !parameters[1].EqualsIgnoreCase("no"))
                 {
                     yield return "sendtochaterror!f The specified button to highlight '" + parameters[1] + "' is invalid!";
-                    yield break;
-                }
-                int temp = -1;
-                if (!int.TryParse(parameters[2], out temp))
-                {
-                    yield return "sendtochaterror!f The specified number of seconds to hold the " + parameters[1] + " button for '" + parameters[2] + "' is invalid!";
-                    yield break;
-                }
-                if (temp < 1 || temp > 20)
-                {
-                    yield return "sendtochaterror The specified number of seconds to hold the " + parameters[1] + " button for '" + parameters[2] + "' is out of range 1-20!";
                     yield break;
                 }
                 if (TPHighlightActive)
@@ -252,21 +242,14 @@ public class DisCFScript : MonoBehaviour
                     yield break;
                 }
                 if (parameters[1].EqualsIgnoreCase("yes"))
-                    StartCoroutine(HighlightButtonTP(0, temp));
+                    StartCoroutine(HighlightButtonTP(0));
                 else
-                    StartCoroutine(HighlightButtonTP(1, temp));
+                    StartCoroutine(HighlightButtonTP(1));
                 while (TPHighlightActive) yield return "trycancel";
-            }
-            else if (parameters.Length == 2)
-            {
-                if (parameters[1].EqualsIgnoreCase("yes") || parameters[1].EqualsIgnoreCase("no"))
-                    yield return "sendtochaterror Please specify how long to highlight the " + parameters[1] + " button for!";
-                else
-                    yield return "sendtochaterror!f The specified button to highlight '" + parameters[1] + "' is invalid!";
             }
             else if (parameters.Length == 1)
             {
-                yield return "sendtochaterror Please specify what button to highlight and how long to highlight it for!";
+                yield return "sendtochaterror Please specify what button to highlight!";
             }
             yield break;
         }
@@ -278,6 +261,11 @@ public class DisCFScript : MonoBehaviour
                 if (parameters[1].EqualsIgnoreCase("no"))
                 {
                     yield return "sendtochaterror Too many parameters!";
+                    yield break;
+                }
+                if (!parameters[1].EqualsIgnoreCase("yes"))
+                {
+                    yield return "sendtochaterror!f The specified button to press '" + parameters[1] + "' is invalid!";
                     yield break;
                 }
                 List<int> presses = new List<int>();
@@ -369,11 +357,18 @@ public class DisCFScript : MonoBehaviour
         }
     }
 
-    IEnumerator HighlightButtonTP(int btn, int time)
+    IEnumerator HighlightButtonTP(int btn)
     {
         TPHighlightActive = true;
+        int temp = screen;
+        while (temp == screen)
+            yield return null;
         buttons[btn].OnHighlight();
-        yield return new WaitForSeconds(time);
+        temp = screen;
+        while (temp == screen)
+            yield return null;
+        while (temp != screen)
+            yield return null;
         buttons[btn].OnHighlightEnded();
         TPHighlightActive = false;
     }

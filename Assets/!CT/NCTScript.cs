@@ -305,7 +305,7 @@ public class NCTScript : MonoBehaviour {
         if (initialphase)
         {
             while ((int)info.GetTime() % 10 != timesub[0])
-                yield return false;
+                yield return true;
             flip.OnInteract();
         }
         else
@@ -321,5 +321,7 @@ public class NCTScript : MonoBehaviour {
             flip.OnInteractEnded();
             time = (int)info.GetTime();
         }
+        while (!moduleSolved)
+            yield return true;
     }
 }

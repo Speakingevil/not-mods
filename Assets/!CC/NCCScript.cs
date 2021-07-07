@@ -243,6 +243,7 @@ public class NCCScript : MonoBehaviour {
                         tpheld[i] = false;
                         yield return null;
                         buttons[i].OnInteractEnded();
+                        yield return new WaitForSeconds(0.1f);
                         break;
                     }
                 yield return null;
@@ -297,6 +298,7 @@ public class NCCScript : MonoBehaviour {
                         tpheld[i] = false;
                         yield return null;
                         buttons[i].OnInteractEnded();
+                        yield return new WaitForSeconds(0.1f);
                         break;
                     }
                 tpheld[possiblecommands.IndexOf(command)] = true;
@@ -316,10 +318,12 @@ public class NCCScript : MonoBehaviour {
                     tpheld[i] = false;
                     yield return null;
                     buttons[i].OnInteractEnded();
+                    yield return new WaitForSeconds(0.1f);
                     break;
                 }
             yield return null;
             buttons[4].OnInteract();
+            yield return new WaitForSeconds(0.1f);
         }
         for(int i = 0; i < 4; i++)
         {

@@ -5,6 +5,7 @@ using System.Linq;
 using UnityEngine;
 using KModkit;
 using Random = UnityEngine.Random;
+using System.Text.RegularExpressions;
 
 public class NX01Script : MonoBehaviour {
 
@@ -293,5 +294,134 @@ public class NX01Script : MonoBehaviour {
         }
         for (int i = 0; i < 20; i++)
             segs[i].material = cols[i % 2];
+    }
+
+    //twitch plays
+#pragma warning disable 414
+    private readonly string TwitchHelpMessage = @"!{0} bullseye [Presses the bullseye] | !{0} press <#> (#₂)... [Presses the specified sector(s), where sectors are 1-10 in clockwise order starting from north]";
+#pragma warning restore 414
+    IEnumerator ProcessTwitchCommand(string command)
+    {
+        if (Regex.IsMatch(command, @"^\s*bullseye\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
+        {
+            yield return null;
+            if (play[2])
+            {
+                yield return "sendtochaterror Cannot interact with the module while it is submitting!";
+                yield break;
+            }
+            buttons[Random.Range(40, 42)].OnInteract();
+            if (play[2] && answer[0].SequenceEqual(answer[1]))
+                yield return "solve";
+            else if (play[2] && !answer[0].SequenceEqual(answer[1]))
+                yield return "strike";
+            yield break;
+        }
+        string[] parameters = command.Split(' ');
+        if (Regex.IsMatch(parameters[0], @"^\s*press\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
+        {
+            yield return null;
+            if (parameters.Length > 1)
+            {
+                for (int i = 1; i < parameters.Length; i++)
+                {
+                    int temp = -1;
+                    if (!int.TryParse(parameters[i], out temp))
+                    {
+                        yield return "sendtochaterror!f The specified sector to press '" + parameters[i] + "' is invalid!";
+                        yield break;
+                    }
+                    if (temp < 1 || temp > 10)
+                    {
+                        yield return "sendtochaterror The specified sector to press '" + parameters[i] + "' is out of range 1-10!";
+                        yield break;
+                    }
+                }
+                if (play[2])
+                {
+                    yield return "sendtochaterror Cannot interact with the module while it is submitting!";
+                    yield break;
+                }
+                if (!play[0])
+                {
+                    yield return "sendtochaterror Cannot press any sectors until the module has been activated!";
+                    yield break;
+                }
+                for (int i = 1; i < parameters.Length; i++)
+                {
+                    buttons[(int.Parse(parameters[i]) - 1) * 4 + Random.Range(0, 4)].OnInteract();
+                    yield return new WaitForSeconds(0.4f);
+                }
+            }
+            else if (parameters.Length == 1)
+            {
+                yield return "sendtochaterror Please specify at least one sector to press!";
+            }
+            yield break;
+        }
+    }
+
+    IEnumerator TwitchHandleForcedSolve()
+    {
+        if (play[0] && !play[1])
+        {
+            if (!play[2])
+            {
+                for (int i = 0; i < 10; i++)
+                {
+                    if (!answer[0][i] && answer[1][i])
+                    {
+                        StopAllCoroutines();
+                        moduleSolved = true;
+                        module.HandlePass();
+                        StartCoroutine("Solve");
+                        yield break;
+                    }
+                }
+            }
+            else if (!answer[0].SequenceEqual(answer[1]))
+            {
+                StopAllCoroutines();
+                moduleSolved = true;
+                module.HandlePass();
+                StartCoroutine("Solve");
+                yield break;
+            }
+        }
+        if (play[2] && stage == 3)
+        {
+            while (!moduleSolved)
+                yield return true;
+        }
+        else
+        {
+            if (!play[0])
+            {
+                buttons[Random.Range(40, 42)].OnInteract();
+                yield return new WaitForSeconds(0.1f);
+            }
+            while (play[2])
+                yield return true;
+            int start = stage;
+            for (int i = start; i < 4; i++)
+            {
+                for (int j = 0; j < 10; j++)
+                {
+                    if (answer[0][j] && !answer[1][j])
+                    {
+                        buttons[j * 4 + Random.Range(0, 4)].OnInteract();
+                        yield return new WaitForSeconds(0.4f);
+                    }
+                }
+                buttons[Random.Range(40, 42)].OnInteract();
+                if (i != 3)
+                {
+                    while (play[2])
+                        yield return true;
+                }
+            }
+            while (!moduleSolved)
+                yield return true;
+        }
     }
 }

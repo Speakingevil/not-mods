@@ -347,7 +347,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1597327976067372}
   m_LocalRotation: {x: 0, y: -1, z: 0, w: -0.00000016292068}
-  m_LocalPosition: {x: -0.004, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4830637236769226}
@@ -435,7 +435,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1288840029816558}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.071, y: 0.01986, z: 0.076057}
+  m_LocalPosition: {x: 0.075167, y: 0.01986, z: 0.076057}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 4704509084930986}
@@ -919,7 +919,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ModuleType: uncolourFlash
   ModuleDisplayName: Uncolour Flash
-  RequiresTimerVisibility: 1
+  RequiresTimerVisibility: 0
 --- !u!114 &114368816607283236
 MonoBehaviour:
   m_ObjectHideFlags: 1

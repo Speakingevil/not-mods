@@ -233,6 +233,7 @@ public class NtBScript : MonoBehaviour {
         bulb[0].SetActive(false);
     }
 
+    //twitch plays
 #pragma warning disable 414
     private readonly string TwitchHelpMessage = @"!{0} <B/I/O> [Presses the bulb, I button, or O button] | !{0} colorblind [Toggles colorblind mode] | Presses can be chained, for ex: !{0} IOOIB";
 #pragma warning restore 414

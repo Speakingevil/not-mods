@@ -235,10 +235,10 @@ public class NCFScript : MonoBehaviour {
             {
                 while(seq[i][pos[i]] != taps[i])
                 {
-                    yield return null;
                     buttons[i].OnInteract();
                     yield return null;
                     buttons[i].OnInteractEnded();
+                    yield return new WaitForSeconds(0.1f);
                 }
             }
         }
@@ -251,10 +251,10 @@ public class NCFScript : MonoBehaviour {
         {
             while (seq[i][pos[i]] != taps[i])
             {
-                yield return null;
                 buttons[i].OnInteract();
                 yield return null;
                 buttons[i].OnInteractEnded();
+                yield return new WaitForSeconds(0.1f);
             }
         }
         yield return null;
