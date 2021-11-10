@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -7,7 +7,8 @@ using Random = UnityEngine.Random;
 using System.Text.RegularExpressions;
 using System.Collections;
 
-public class NSCScript : MonoBehaviour {
+public class NSCScript : MonoBehaviour
+{
 
     public KMAudio Audio;
     public KMBombModule module;
@@ -18,7 +19,7 @@ public class NSCScript : MonoBehaviour {
     public Material[] cols;
 
     private readonly string opkey = "fibcgmhdlnfbdnhciklcemafdfjjglkcaamhjlmfdigkaceinackneehgbad";
-    private readonly int[] primes = new int[] { 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97};
+    private readonly int[] primes = new int[] { 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97 };
     private readonly string symbtext = "ABCDEFGHLMNOPQXZghlp";
     private int[] binorder = new int[4] { 0, 1, 2, 3 };
     private bool[] neg = new bool[3];
@@ -46,7 +47,7 @@ public class NSCScript : MonoBehaviour {
             leds[i + 3].material = cols[neg[i] ? 1 : 0];
         }
         displays[0].text = symbols.Select(x => symbtext[x].ToString()).Join();
-        for(int i = 0; i < 2; i++)
+        for (int i = 0; i < 2; i++)
         {
             functionlists[i].Shuffle();
             functions[i].Add(functionlists[i][0]);
@@ -66,7 +67,7 @@ public class NSCScript : MonoBehaviour {
                 {
                     case 0: return symbols[1] + 1;
                     case 1: return DateTime.Now.Hour * 2;
-                    default: return info.GetPortPlateCount() * 6;                
+                    default: return info.GetPortPlateCount() * 6;
                 }
             case 1:
                 switch (i)
@@ -191,7 +192,7 @@ public class NSCScript : MonoBehaviour {
                 switch (i)
                 {
                     case 0: return info.GetSerialNumberNumbers().Max();
-                    case 1: return info.GetOnIndicators().Count() == 0 ? 0 :string.Join("", info.GetOnIndicators().ToArray()).Select(k => k - 'A' + 1).Max();
+                    case 1: return info.GetOnIndicators().Count() == 0 ? 0 : string.Join("", info.GetOnIndicators().ToArray()).Select(k => k - 'A' + 1).Max();
                     default: return info.GetPortPlateCount() + info.GetBatteryHolderCount();
                 }
             default:
@@ -233,7 +234,7 @@ public class NSCScript : MonoBehaviour {
                 switch (i)
                 {
                     case 0: return Enumerable.Range(0, 3).Select(k => symnums[k]).Count(k => k >= 20) > 1;
-                    case 1: return new char[] {'1', '2'}.All(q => string.Join("", Enumerable.Range(3, 3).Select(k => symnums[k].ToString()).ToArray()).Contains(q));
+                    case 1: return new char[] { '1', '2' }.All(q => string.Join("", Enumerable.Range(3, 3).Select(k => symnums[k].ToString()).ToArray()).Contains(q));
                     default: return primes.Contains(symnums[6]);
                 }
             case 4:
@@ -374,7 +375,7 @@ public class NSCScript : MonoBehaviour {
 
     private void Activate()
     {
-        Debug.LogFormat("[Not Symbolic Coordinates #{0}] The displayed symbols are the {1}, {2}, and {3} symbols in the manual, from the top.", moduleID, (symbols[0] + 1).ToString() + (symbols[0] > 2 ? "th" : new string[] { "st", "nd", "rd"}[symbols[0]]), (symbols[1] + 1).ToString() + (symbols[1] > 2 ? "th" : new string[] { "st", "nd", "rd" }[symbols[1]]), (symbols[2] + 1).ToString() + (symbols[2] > 2 ? "th" : new string[] { "st", "nd", "rd" }[symbols[2]]));
+        Debug.LogFormat("[Not Symbolic Coordinates #{0}] The displayed symbols are the {1}, {2}, and {3} symbols in the manual, from the top.", moduleID, (symbols[0] + 1).ToString() + (symbols[0] > 2 ? "th" : new string[] { "st", "nd", "rd" }[symbols[0]]), (symbols[1] + 1).ToString() + (symbols[1] > 2 ? "th" : new string[] { "st", "nd", "rd" }[symbols[1]]), (symbols[2] + 1).ToString() + (symbols[2] > 2 ? "th" : new string[] { "st", "nd", "rd" }[symbols[2]]));
         for (int i = 0; i < 3; i++)
         {
             symnums[i] = N(symbols[i], i) % 100;
@@ -397,8 +398,8 @@ public class NSCScript : MonoBehaviour {
         for (int i = 0; i < 3; i++)
         {
             int k = 0;
-            for(int j = 0; j < 3; j++)
-                if(i != j)
+            for (int j = 0; j < 3; j++)
+                if (i != j)
                 {
                     outputs[i, k] = T(symbols[i], j) ^ neg[k];
                     k = 1;
@@ -410,12 +411,12 @@ public class NSCScript : MonoBehaviour {
             for (int j = 0; j < 2; j++)
             {
                 outputs[3 + (i * 2), j] = L(outputs[i, j], outputs[i + 1, j], opkey[(ans[i] * 3) + i + j]);
-                logops[(4 * i) + j] = string.Format("[Not Symbolic Coordinates #{0}] {1} {4}{5} {2} = {3}", moduleID, outputs[i, j] ? "T" : "F", outputs[i + 1, j] ? "T" : "F", outputs[3 + (i * 2), j] ? "T" : "F", new string[] { "\u03b1", "\u03b2", "\u03b3"}[i + j], "LR"[i]);
+                logops[(4 * i) + j] = string.Format("[Not Symbolic Coordinates #{0}] {1} {4}{5} {2} = {3}", moduleID, outputs[i, j] ? "T" : "F", outputs[i + 1, j] ? "T" : "F", outputs[3 + (i * 2), j] ? "T" : "F", new string[] { "\u03b1", "\u03b2", "\u03b3" }[i + j], "LR"[i]);
             }
         if (info.IsIndicatorPresent(Indicator.CLR))
         {
             if (neg[2])
-            {               
+            {
                 outputs[4, 0] = L(outputs[0, 0], outputs[2, 0], opkey[(ans[0] * 3) + 2]);
                 outputs[4, 1] = L(outputs[0, 1], outputs[2, 1], opkey[ans[1] * 3]);
             }
@@ -441,7 +442,7 @@ public class NSCScript : MonoBehaviour {
         logops[neg[2] ? 2 : 3] = string.Format("[Not Symbolic Coordinates #{0}] {1} {3} {2} = {4}", moduleID, (neg[2] ^ info.IsIndicatorPresent(Indicator.CLR) ? outputs[0, 1] : outputs[0, 0]) ? "T" : "F", (neg[2] ^ info.IsIndicatorPresent(Indicator.CLR) ? outputs[2, 1] : outputs[2, 0]) ? "T" : "F", neg[2] ? "\u03b3" + "L" : "\u03b1" + "R", outputs[4, 0] ? "T" : "F");
         logops[neg[2] ? 3 : 2] = string.Format("[Not Symbolic Coordinates #{0}] {1} {3} {2} = {4}", moduleID, (neg[2] ^ info.IsIndicatorPresent(Indicator.CLR) ? outputs[0, 0] : outputs[0, 1]) ? "T" : "F", (neg[2] ^ info.IsIndicatorPresent(Indicator.CLR) ? outputs[2, 0] : outputs[2, 1]) ? "T" : "F", neg[2] ? "\u03b1" + "R" : "\u03b3" + "L", outputs[4, 1] ? "T" : "F");
         int batt = info.GetBatteryCount();
-        for(int i = 0; i < 4; i++)
+        for (int i = 0; i < 4; i++)
         {
             binorder[i] += batt * 3;
             binorder[i] %= 4;
@@ -454,20 +455,20 @@ public class NSCScript : MonoBehaviour {
             ledcols[i] = outputs[i + 3, 0] ? (outputs[i + 3, 1] ? binorder[3] : binorder[2]) : (outputs[i + 3, 1] ? binorder[1] : binorder[0]);
             leds[i].material = cols[ledcols[i] + 2];
         }
-        Debug.LogFormat("[Not Symbolic Coordinates #{0}] The colours of the LEDs are: {1}", moduleID, string.Join(", ", ledcols.Select(k => new string[] { "Green", "Yellow", "Aqua", "Purple"}[k]).ToArray()));
+        Debug.LogFormat("[Not Symbolic Coordinates #{0}] The colours of the LEDs are: {1}", moduleID, string.Join(", ", ledcols.Select(k => new string[] { "Green", "Yellow", "Aqua", "Purple" }[k]).ToArray()));
         Debug.LogFormat("[Not Symbolic Coordinates #{0}] The target outputs of the operator sets are: {1}", moduleID, string.Join(", ", Enumerable.Range(3, 3).Select(k => (outputs[k, 0] ? "T" : "F") + "|" + (outputs[k, 1] ? "T" : "F")).ToArray()));
         Debug.LogFormat(string.Join("\n", logops));
         for (int i = 0; i < 2; i++)
         {
             int query = 0;
             bool[] check = Enumerable.Range(3, 3).Select(k => outputs[k, i]).ToArray();
-            while(query < functionlists[i].Count())
+            while (query < functionlists[i].Count())
             {
                 bool[] pass = new bool[2] { false, false };
                 for (int k = 0; k < 2; k++)
                 {
                     for (int j = 0; j < 2; j++)
-                        if (check[k * 2] != L(outputs[k, j], outputs[k + 1, j], opkey[(functionlists[i][query] * 3) + k + j]))
+                        if (check[k * 2] ^ L(outputs[k, j], outputs[k + 1, j], opkey[(functionlists[i][query] * 3) + k + j]))
                         {
                             if (pass[0])
                             {
@@ -487,7 +488,7 @@ public class NSCScript : MonoBehaviour {
                 {
                     if (neg[2])
                     {
-                        if(pass[1] && check[1] != L(outputs[0, 0], outputs[2, 0], opkey[(functionlists[i][query] * 3) + 2]) && check[1] != L(outputs[0, 1], outputs[2, 1], opkey[functionlists[i][query] * 3]))
+                        if (pass[1] && check[1] ^ L(outputs[0, 0], outputs[2, 0], opkey[(functionlists[i][query] * 3) + 2]) && check[1] ^ L(outputs[0, 1], outputs[2, 1], opkey[functionlists[i][query] * 3]))
                         {
                             query++;
                             goto next;
@@ -495,7 +496,7 @@ public class NSCScript : MonoBehaviour {
                     }
                     else
                     {
-                        if(pass[1] && check[1] != L(outputs[0, 1], outputs[2, 1], opkey[functionlists[i][query] * 3]) && check[1] != L(outputs[0, 0], outputs[2, 0], opkey[(functionlists[i][query] * 3) + 2]))
+                        if (pass[1] && check[1] != L(outputs[0, 1], outputs[2, 1], opkey[functionlists[i][query] * 3]) && check[1] != L(outputs[0, 0], outputs[2, 0], opkey[(functionlists[i][query] * 3) + 2]))
                         {
                             query++;
                             goto next;
@@ -522,17 +523,18 @@ public class NSCScript : MonoBehaviour {
                     }
                 }
                 functionlists[i].RemoveAt(query);
-                next:;
+            next:;
             }
+            Debug.Log(string.Join(", ", functionlists[i].Select(x => "0123456789ABCDEFGHIJ"[x].ToString()).ToArray()));
             for (int j = 0; j < Mathf.Min(4, functionlists[i].Count()); j++)
                 functions[i].Add(functionlists[i][j]);
             functions[i].Shuffle();
             Debug.LogFormat("[Not Symbolic Coordinates #{0}] The possible {1} sets of functions are: {2}", moduleID, i == 0 ? "left" : "right", string.Join(", ", functions[i].Select(k => "0123456789ABCDEFGHIJ"[k].ToString()).ToArray()));
         }
         Debug.LogFormat("[Not Symbolic Coordinates #{0}] The sets that yield the target outputs are {1} and {2}.", moduleID, "0123456789ABCDEFGHIJ"[ans[0]], "0123456789ABCDEFGHIJ"[ans[1]]);
-        for(int i = 0; i < 2; i++)
+        for (int i = 0; i < 2; i++)
             displays[i + 1].text = "0123456789ABCDEFGHIJ"[functions[i][0]].ToString();
-        foreach(KMSelectable button in buttons)
+        foreach (KMSelectable button in buttons)
         {
             int b = buttons.IndexOf(button);
             button.OnInteract = delegate () { Press(b); return false; };
