@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,7 +6,8 @@ using UnityEngine;
 using KModkit;
 using Random = UnityEngine.Random;
 
-public class NMorScript : MonoBehaviour {
+public class NMorScript : MonoBehaviour
+{
 
     public KMAudio Audio;
     public KMBombModule module;
@@ -38,7 +39,7 @@ public class NMorScript : MonoBehaviour {
         "IAMBS", "ICHOR", "IMAGE", "INDEX", "INGOT", "IRATE", "IRONS", "ITCHY",
         "JACKS", "JAUNT", "JERKY", "JIVES", "JOKER", "JOUST", "JUICE", "JUMBO",
         "KANJI", "KAPUT", "KENDO", "KETCH", "KLUTZ", "KNAVE", "KNOWS", "KUGEL",
-        "LARGE", "LAWNS", "LAYER", "LIMBO", "LOCUS", "LOUSY", "LUNCH", "LYRIC",
+        "LARGE", "LAWNS", "LIGHT", "LIMBO", "LOCUS", "LOUSY", "LUNCH", "LYRIC",
         "MACHO", "MAGIC", "MAJOR", "MAZES", "MERCY", "MIXER", "MOTIF", "MUSIC",
         "NEXUS", "NICHE", "NIGHT", "NODAL", "NOTCH", "NOVEL", "NURSE", "NYMPH",
         "OCEAN", "OFTEN", "OGHAM", "OLIVE", "OMEGA", "ONSET", "ORBIT", "OTHER",
@@ -169,7 +170,7 @@ public class NMorScript : MonoBehaviour {
             }
             return false;
         };
-        foreach(KMSelectable button in tbuttons)
+        foreach (KMSelectable button in tbuttons)
         {
             int b = Array.IndexOf(tbuttons, button);
             button.OnInteract += delegate () { TPress(b); return false; };
@@ -190,7 +191,7 @@ public class NMorScript : MonoBehaviour {
         {
             tobjects[tets[0][i]].SetActive(true);
             trends[tets[0][i]].material = tmats[tets[1][i]];
-            if(i > 3)
+            if (i > 3)
                 tobjects[tets[0][i]].SetActive(false);
         }
         List<int>[] presenttets = new List<int>[2];
@@ -210,7 +211,7 @@ public class NMorScript : MonoBehaviour {
         else
             answer[0] = MasterCommand("ABCD1234");
         List<string> logconds = new List<string> { };
-        if(!presenttets[0].Contains(4) && !presenttets[1].Contains(0))
+        if (!presenttets[0].Contains(4) && !presenttets[1].Contains(0))
         {
             int x = answer[0][0];
             answer[0][0] = answer[0][7];
@@ -224,28 +225,28 @@ public class NMorScript : MonoBehaviour {
             answer[0][2] = x;
             logconds.Add("2");
         }
-        if(presenttets[1].Any(x => x > 4 && presenttets[0][presenttets[1].IndexOf(x)] == 0))
+        if (presenttets[1].Any(x => x > 4 && presenttets[0][presenttets[1].IndexOf(x)] == 0))
         {
             int x = answer[0][3];
             answer[0][3] = answer[0][5];
             answer[0][5] = x;
             logconds.Add("3");
         }
-        if(presenttets[1].All(x => x != 2 && x != 3))
+        if (presenttets[1].All(x => x != 2 && x != 3))
         {
             int x = answer[0][2];
             answer[0][2] = answer[0][4];
             answer[0][4] = x;
             logconds.Add("4");
         }
-        if(presenttets[0].All(x => x != 1 && x != 6))
+        if (presenttets[0].All(x => x != 1 && x != 6))
         {
             int x = answer[0][1];
             answer[0][1] = answer[0][6];
             answer[0][6] = x;
             logconds.Add("5");
         }
-        if(presenttets[0].Any(x => (x == 3 || x == 4) && presenttets[1][presenttets[0].IndexOf(x)] == 3))
+        if (presenttets[0].Any(x => (x == 3 || x == 4) && presenttets[1][presenttets[0].IndexOf(x)] == 3))
         {
             int x = answer[0][3];
             answer[0][3] = answer[0][6];
@@ -277,7 +278,7 @@ public class NMorScript : MonoBehaviour {
         int[][] subcommands = new int[2][] { new int[4], new int[4] };
         for (int i = 0; i < 2; i++)
             subcommands[i] = codes[i].Where(p => tets[i].Where((q, k) => k < 4).Contains(p)).ToArray();
-        for(int i = 0; i < 8; i++)
+        for (int i = 0; i < 8; i++)
         {
             if ("ABCD".Contains(order[i].ToString()))
             {
@@ -328,10 +329,10 @@ public class NMorScript : MonoBehaviour {
             new bool[5,3]{ { true, false, true }, { true, false, true }, { false, true, false}, { false, true, false}, { false, true, false} },
             new bool[5,3]{ { true, true, true}, { false, false, true}, { false, true, false}, { true, false, false}, { true, true, true} }
         };
-        bool[][,] display = new bool[5][,] { new bool[5,3], new bool[5,3], new bool[5,3], new bool[5,3], new bool[5,3]};
+        bool[][,] display = new bool[5][,] { new bool[5, 3], new bool[5, 3], new bool[5, 3], new bool[5, 3], new bool[5, 3] };
         for (int i = 0; i < 5; i++)
             display[i] = letters[t[i] - 'A'];
-        for(int i = 0; i < 5; i++)
+        for (int i = 0; i < 5; i++)
         {
             for (int j = 0; j < 5; j++)
             {
@@ -342,7 +343,7 @@ public class NMorScript : MonoBehaviour {
             for (int k = 0; k < 3; k++)
                 leds[k].material = io[1];
             yield return new WaitForSeconds(0.33f);
-            if(i == 4)
+            if (i == 4)
             {
                 i = -1;
                 yield return new WaitForSeconds(0.67f);
@@ -412,7 +413,7 @@ public class NMorScript : MonoBehaviour {
     private IEnumerator Countdown()
     {
         int time = 99;
-        for(int i = 0; i < 99; i++)
+        for (int i = 0; i < 99; i++)
         {
             displays[2].text = (time < 10 ? "0" : "") + time.ToString();
             yield return new WaitForSeconds(1);
@@ -429,7 +430,7 @@ public class NMorScript : MonoBehaviour {
         {
             Audio.PlaySoundAtTransform("Keypress", tbuttons[b].transform);
             tbuttons[b].AddInteractionPunch(0.8f);
-            if(answer[1].Count() < 8)
+            if (answer[1].Count() < 8)
             {
                 answer[1].Add(b);
                 displays[0].text += "AMHDBKJ"[b].ToString();
@@ -444,9 +445,9 @@ public class NMorScript : MonoBehaviour {
     private IEnumerator ProcessTwitchCommand(string command)
     {
         command = command.ToLowerInvariant();
-        if(command == "toggle")
+        if (command == "toggle")
         {
-            if(submission[0] || submission[1])
+            if (submission[0] || submission[1])
             {
                 yield return "sendtochaterror!f Cannot toggle transmission in this state.";
                 yield break;
@@ -457,7 +458,7 @@ public class NMorScript : MonoBehaviour {
                 tswitch.OnInteract();
             }
         }
-        else if(command == "activate")
+        else if (command == "activate")
         {
             if (submission[0] || submission[1])
             {
@@ -472,28 +473,28 @@ public class NMorScript : MonoBehaviour {
         }
         else
         {
-            if(submission[0] || !submission[1])
+            if (submission[0] || !submission[1])
             {
                 yield return "sendtochaterror!f Cannot input sequence in transmission state.";
                 yield break;
             }
             string[] commands = command.Split(' ');
-            if(commands.Length == 2 && commands[0] == "submit")
+            if (commands.Length == 2 && commands[0] == "submit")
             {
-                if(commands[1].Length != 8)
+                if (commands[1].Length != 8)
                 {
                     yield return "sendtochaterror!f Input sequence must contain exactly 8 entries.";
                     yield break;
                 }
                 commands[1] = commands[1].ToUpperInvariant();
                 string possibleinputs = string.Join("", tets[0].Select(x => "IJZTOSL"[x].ToString()).Where((x, k) => k < 4).ToArray());
-                for(int i = 0; i < 8; i++)
+                for (int i = 0; i < 8; i++)
                     if (!possibleinputs.Contains(commands[1][i].ToString()))
                     {
                         yield return "sendtochaterror " + commands[1][i].ToString() + " is not a present key shape.";
                         yield break;
                     }
-                for(int i = 0; i < 8; i++)
+                for (int i = 0; i < 8; i++)
                 {
                     yield return null;
                     tbuttons["IJZTOSL".IndexOf(commands[1][i].ToString())].OnInteract();
@@ -519,7 +520,7 @@ public class NMorScript : MonoBehaviour {
         }
         while (submission[0])
             yield return null;
-        for(int i = 0; i < 8; i++)
+        for (int i = 0; i < 8; i++)
         {
             yield return null;
             tbuttons[answer[0][i]].OnInteract();
