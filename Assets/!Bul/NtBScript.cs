@@ -52,12 +52,8 @@ public class NtBScript : MonoBehaviour {
         moduleID = ++moduleIDCounter;
         matstore.SetActive(false);
         cb = cbmode.ColorblindModeActive;
-        float l = transform.lossyScale.x;
         foreach (GameObject light in lights)
-        {
-            light.GetComponent<Light>().range *= l;
             light.SetActive(false);
-        }
         properties = new int[3] { Random.Range(0, 6), Random.Range(0, 5), Random.Range(0, 2)};
         lights[0].GetComponent<Light>().color = lights[1].GetComponent<Light>().color = lightcols[properties[0]];
         brends[0].material = bulbcols[properties[0]];
@@ -86,6 +82,13 @@ public class NtBScript : MonoBehaviour {
             int b = buttons.IndexOf(button);
             button.OnInteract = delegate () { Press(b); return false; };
         }
+    }
+
+    private void Start()
+    {
+        float l = transform.lossyScale.x;
+        foreach (GameObject light in lights)
+            light.GetComponent<Light>().range *= l;
     }
 
     private void Ansgen()

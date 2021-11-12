@@ -152,7 +152,7 @@ public class NMorScript : MonoBehaviour
                 if (submission[1])
                 {
                     StopCoroutine("Countdown");
-                    StartCoroutine("MoveHatch");
+                    StartCoroutine(MoveHatch(false));
                 }
                 else
                 {
@@ -165,7 +165,7 @@ public class NMorScript : MonoBehaviour
                         transmitting = false;
                     }
                     Generate();
-                    StartCoroutine("MoveHatch");
+                    StartCoroutine(MoveHatch(false));
                 }
             }
             return false;
@@ -351,19 +351,24 @@ public class NMorScript : MonoBehaviour
         }
     }
 
-    private IEnumerator MoveHatch()
+    private IEnumerator MoveHatch(bool autosolve)
     {
         Audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.WireSequenceMechanism, transform);
         if (submission[1])
         {
             displays[2].text = "--";
-            if (answer[1].Count() < 1)
-                Debug.LogFormat("[Not Morsematics #{0}] Submitted nothing.", moduleID);
+            if (!autosolve)
+            {
+                if (answer[1].Count() < 1)
+                    Debug.LogFormat("[Not Morsematics #{0}] Submitted nothing.", moduleID);
+                else
+                    Debug.LogFormat("[Not Morsematics #{0}] Submitted keypresses {1}", moduleID, string.Join("", answer[1].Select(x => "IJZTOSL"[x].ToString()).ToArray()));
+            }
             else
-                Debug.LogFormat("[Not Morsematics #{0}] Submitted keypresses {1}", moduleID, string.Join("", answer[1].Select(x => "IJZTOSL"[x].ToString()).ToArray()));
+                Debug.LogFormat("[Not Morsematics #{0}] Incorrect keypress detected. Forcing correct submission due to autosolve.", moduleID);
             StopCoroutine("Countdown");
             bool correct = answer[0].SequenceEqual(answer[1]);
-            if (correct)
+            if (correct || autosolve)
             {
                 moduleSolved = true;
                 Audio.PlaySoundAtTransform("InputCorrect", transform);
@@ -380,7 +385,7 @@ public class NMorScript : MonoBehaviour
                 yield return new WaitForSeconds(0.05f);
             }
             house.transform.localPosition -= new Vector3(0, 0.008f, 0);
-            if (correct)
+            if (correct || autosolve)
                 module.HandlePass();
             else
             {
@@ -421,7 +426,7 @@ public class NMorScript : MonoBehaviour
         }
         displays[2].text = "00";
         Debug.LogFormat("[Not Morsematics #{0}] Time's up. Auto-submitting.", moduleID);
-        StartCoroutine("MoveHatch");
+        StartCoroutine(MoveHatch(false));
     }
 
     private void TPress(int b)
@@ -511,22 +516,42 @@ public class NMorScript : MonoBehaviour
 
     private IEnumerator TwitchHandleForcedSolve()
     {
-        while (submission[0])
-            yield return true;
-        if (!submission[1])
+        if (!moduleSolved)
         {
+            if (!submission[0] && submission[1])
+            {
+                for (int i = 0; i < answer[1].Count; i++)
+                {
+                    if (answer[1][i] != answer[0][i])
+                    {
+                        StartCoroutine(MoveHatch(true));
+                        while (submission[1]) yield return true;
+                        yield break;
+                    }
+                }
+            }
+            while (submission[0] && submission[1])
+                yield return true;
+            if (!submission[1])
+            {
+                if (!submission[0])
+                {
+                    yield return null;
+                    tsubmit.OnInteract();
+                }
+                while (submission[0])
+                    yield return null;
+            }
+            int start = answer[1].Count;
+            for (int i = start; i < 8; i++)
+            {
+                yield return null;
+                tbuttons[answer[0][i]].OnInteract();
+                yield return new WaitForSeconds(0.05f);
+            }
             yield return null;
             tsubmit.OnInteract();
         }
-        while (submission[0])
-            yield return null;
-        for (int i = 0; i < 8; i++)
-        {
-            yield return null;
-            tbuttons[answer[0][i]].OnInteract();
-            yield return new WaitForSeconds(0.05f);
-        }
-        yield return null;
-        tsubmit.OnInteract();
+        while (submission[1]) yield return true;
     }
 }
