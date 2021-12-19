@@ -170,7 +170,7 @@ public class NMurScript : MonoBehaviour {
             turns.Add(suspectlist.ToList());
             Debug.LogFormat("[Not Murder #{0}] Turn {2}:\n[Not Murder #{0}] {1}", moduleID, string.Join("\n[Not Murder #" + moduleID + "] ", turns[i + 1].Select((x, k) => new string[] { "Miss Scarlett", "Colonel Mustard", "Reverand Green", "Mrs Peacock", "Professor Plum", "Mrs White" }[dispinfo[0][k]] + " was in the " + new string[] { "Ballroom", "Billiard Room", "Conservatory", "Dining Room", "Hall", "Kitchen", "Library", "Lounge", "Study" }[x[0]] + " with the " + new string[] { "Candlestick", "Dagger", "Lead Pipe", "Revolver", "Rope", "Spanner" }[x[1]] + ".").ToArray()), i + 1);
         }
-        displays[0].text = new string[] { "MISS SCARLETT", "COLONEL MUSTARD", "REVERAND GREEN", "MRS PEACOCK", "PROFESSOR PLUM", "MRS WHITE" }[dispinfo[0][selection[0]]];
+        displays[0].text = new string[] { "MISS SCARLETT", "COLONEL MUSTARD", "REVEREND GREEN", "MRS PEACOCK", "PROFESSOR PLUM", "MRS WHITE" }[dispinfo[0][selection[0]]];
         displays[0].color = new Color[] { new Color(1f, 0.05f, 0.05f), new Color(0.85f, 0.85f, 0.15f), new Color(0.1f, 0.8f, 0.1f), new Color(0.3f, 0.3f, 1f), new Color(0.8f, 0.15f, 0.55f), new Color(1f, 1f, 1f) }[dispinfo[0][selection[0]]];
         displays[1].text = new string[] { "CANDLESTICK", "DAGGER", "LEAD PIPE", "REVOLVER", "ROPE", "SPANNER" }[dispinfo[1][selection[1]]];
         displays[1].color = new Color(0.8f, 0.8f, 0.8f);
@@ -196,7 +196,7 @@ public class NMurScript : MonoBehaviour {
                     submission[i - 1] = dispinfo[i][selection[i]];
                 if (turns[5][selection[0]].SequenceEqual(submission.Reverse()))
                 {
-                    Debug.LogFormat("[Not Murder #{0}] Accusation: {1} left with the {3} through the {2}. Correct.", moduleID, new string[] { "Miss Scarlett", "Colonel Mustard", "Reverand Green", "Mrs Peacock", "Professor Plum", "Mrs White" }[dispinfo[0][selection[0]]], new string[] { "Ballroom", "Billiard Room", "Conservatory", "Dining Room", "Hall", "Kitchen", "Library", "Lounge", "Study" }[submission[1]], new string[] { "Candlestick", "Dagger", "Lead Pipe", "Revolver", "Rope", "Spanner" }[submission[0]]);
+                    Debug.LogFormat("[Not Murder #{0}] Accusation: {1} left with the {3} through the {2}. Correct.", moduleID, new string[] { "Miss Scarlett", "Colonel Mustard", "Reverend Green", "Mrs Peacock", "Professor Plum", "Mrs White" }[dispinfo[0][selection[0]]], new string[] { "Ballroom", "Billiard Room", "Conservatory", "Dining Room", "Hall", "Kitchen", "Library", "Lounge", "Study" }[submission[1]], new string[] { "Candlestick", "Dagger", "Lead Pipe", "Revolver", "Rope", "Spanner" }[submission[0]]);
                     if (dispinfo[0].Count() == 1)
                     {
                         moduleSolved = true;
@@ -210,14 +210,14 @@ public class NMurScript : MonoBehaviour {
                             dispinfo[i].RemoveAt(selection[i]);
                             selection[i] %= dispinfo[i].Count();
                         }
-                        displays[0].text = new string[] { "MISS SCARLETT", "COLONEL MUSTARD", "REVERAND GREEN", "MRS PEACOCK", "PROFESSOR PLUM", "MRS WHITE" }[dispinfo[0][selection[0]]];
+                        displays[0].text = new string[] { "MISS SCARLETT", "COLONEL MUSTARD", "REVEREND GREEN", "MRS PEACOCK", "PROFESSOR PLUM", "MRS WHITE" }[dispinfo[0][selection[0]]];
                         displays[0].color = new Color[] { new Color(1f, 0.05f, 0.05f), new Color(0.85f, 0.85f, 0.15f), new Color(0.1f, 0.8f, 0.1f), new Color(0.3f, 0.3f, 1f), new Color(0.8f, 0.15f, 0.55f), new Color(1f, 1f, 1f) }[dispinfo[0][selection[0]]];
                         displays[1].text = new string[] { "CANDLESTICK", "DAGGER", "LEAD PIPE", "REVOLVER", "ROPE", "SPANNER" }[dispinfo[1][selection[1]]];
                     }
                 }
                 else
                 {
-                    Debug.LogFormat("[Not Murder #{0}] Accusation: {1} left with the {3} through the {2}. Incorrect.", moduleID, new string[] { "Miss Scarlett", "Colonel Mustard", "Reverand Green", "Mrs Peacock", "Professor Plum", "Mrs White" }[dispinfo[0][selection[0]]], new string[] { "Ballroom", "Billiard Room", "Conservatory", "Dining Room", "Hall", "Kitchen", "Library", "Lounge", "Study" }[submission[1]], new string[] { "Candlestick", "Dagger", "Lead Pipe", "Revolver", "Rope", "Spanner" }[submission[0]]);
+                    Debug.LogFormat("[Not Murder #{0}] Accusation: {1} left with the {3} through the {2}. Incorrect.", moduleID, new string[] { "Miss Scarlett", "Colonel Mustard", "Reverend Green", "Mrs Peacock", "Professor Plum", "Mrs White" }[dispinfo[0][selection[0]]], new string[] { "Ballroom", "Billiard Room", "Conservatory", "Dining Room", "Hall", "Kitchen", "Library", "Lounge", "Study" }[submission[1]], new string[] { "Candlestick", "Dagger", "Lead Pipe", "Revolver", "Rope", "Spanner" }[submission[0]]);
                     module.HandleStrike();
                 }
             }
@@ -228,7 +228,7 @@ public class NMurScript : MonoBehaviour {
                 switch(b / 2)
                 {
                     case 0:
-                        displays[0].text = new string[] { "MISS SCARLETT", "COLONEL MUSTARD", "REVERAND GREEN", "MRS PEACOCK", "PROFESSOR PLUM", "MRS WHITE" }[dispinfo[0][selection[0]]];
+                        displays[0].text = new string[] { "MISS SCARLETT", "COLONEL MUSTARD", "REVEREND GREEN", "MRS PEACOCK", "PROFESSOR PLUM", "MRS WHITE" }[dispinfo[0][selection[0]]];
                         displays[0].color = new Color[] { new Color (1f, 0.05f, 0.05f), new Color(0.85f, 0.85f, 0.15f), new Color (0.1f, 0.8f, 0.1f), new Color(0.3f, 0.3f, 1f), new Color(0.8f, 0.15f, 0.55f), new Color (1f, 1f, 1f) }[dispinfo[0][selection[0]]];
                         break;
                     case 1:

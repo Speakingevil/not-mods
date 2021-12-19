@@ -90,14 +90,15 @@ public class DisCFScript : MonoBehaviour
             {
                 for (int q = p + 1; q < i + 3; q++)
                 {
+                    int matches = 0;
                     for (int j = 0; j < 9; j++)
                     {
                         int[] t = new int[3] { dispinfo[i + 3, j], dispinfo[p, j], dispinfo[q, j] }.OrderBy(x => x).ToArray();
                         if (!triplets.Any(x => x.SequenceEqual(t)))
-                            break;
-                        if (j > 7)
-                            goto repeat;
+                            matches++;
                     }
+                    if (matches < 5 || matches > 8)
+                        goto repeat;
                 }
             }
         }
