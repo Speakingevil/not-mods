@@ -1,6 +1,8 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using System.Text.RegularExpressions;
 using KModkit;
 
 public class JCFScript : MonoBehaviour
@@ -141,6 +143,7 @@ public class JCFScript : MonoBehaviour
     private int[][] bars = new int[2][] { new int[5], new int[5] };
     private int[][] initlocs = new int[2][] { new int[2], new int[2]};
 
+
     private static int moduleIDCounter;
     private int moduleID;
     private bool moduleSolved;
@@ -244,6 +247,7 @@ public class JCFScript : MonoBehaviour
     {
         buttons[b].AddInteractionPunch(0.5f);
         Audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, buttons[b].transform);
+        Debug.Log(display.text + " in " + words[System.Array.IndexOf(cols, display.color)]);
         int tar = bars[b][shifts[b] + 2];
         if (tar != (locs[b][0] * 11) + locs[b][1])
         {
@@ -367,5 +371,59 @@ public class JCFScript : MonoBehaviour
                 shifts[i] += up[1, i] ? 1 : -1;
             }
         }
+    }
+
+#pragma warning disable 414
+    private readonly string TwitchHelpMessage = @"Use [!{0} press no RGB] to wait for those word colors to cycle and then press on the last entry. Similarly, use [!{0} press yes RGB] to wait for those words to cycle. Colors are abbreviated by their first letter. “press” is optional.";
+#pragma warning restore 414
+    
+    struct ScannerState
+    {
+        public bool[] validUpStates;
+        public int finalScannerPos;
+    }
+    IEnumerator ProcessTwitchCommand(string command)
+    {
+        command = command.Trim().ToUpperInvariant();
+        Match m = Regex.Match(command, @"^(?:PRESS\s+)?(Y(?:ES)?|NO?)\s+([RGBMYW]{1,8})$");
+        if (!m.Success)
+            yield break;    
+
+        int[] requestedSequence = m.Groups[2].Value.Select(x => "RGBMYW".IndexOf(x)).ToArray();
+        int[] reversedRequestedSequence = requestedSequence.Reverse().ToArray();
+        int usedScanner = m.Groups[1].Value[0] == 'Y' ? 0 : 1;
+        int[] usedBar = bars[usedScanner];
+        int[] pingPong = { 0, 1, 2, 3, 4, 3, 2, 1, 0, 1, 2, 3, 4, 3, 2, 1 };
+        int[] displayedSequence = pingPong.Select(x => grid[usedBar[x] / 11, usedBar[x] % 11]).ToArray();
+        
+        List<int> startIxs = new List<int>();
+        for (int skipIx = 0; skipIx < 16 - requestedSequence.Length; skipIx++)
+        {
+            if (displayedSequence.Skip(skipIx).Take(requestedSequence.Length).SequenceEqual(requestedSequence))
+                startIxs.Add(skipIx);
+        }
+        if (startIxs.Count == 0)
+            yield return string.Format("sendtochaterror The requested sequence {0} cannot be found in the cycle.", requestedSequence.Select(x => words[x][0]).Join(""));
+
+        List<ScannerState> answerStates = new List<ScannerState>();
+        foreach (int startIx in startIxs)
+        {
+            int scannerIx = startIx % 8;
+            bool[] possibleValuesOfUpArray;
+            if (scannerIx == 0 || scannerIx == 4)
+                possibleValuesOfUpArray = new[] { true, false };
+            else if (scannerIx < 4)
+                possibleValuesOfUpArray = new[] { true };
+            else if (scannerIx > 4)
+                possibleValuesOfUpArray = new[] { false };
+            else throw new System.ArgumentException();
+            int finalIx = startIx + requestedSequence.Length - 1 ;
+            answerStates.Add(new ScannerState() { validUpStates = possibleValuesOfUpArray, finalScannerPos = pingPong[finalIx] - 2 });
+        }
+        yield return null;
+        while (!answerStates.Any(st => st.validUpStates.Contains(up[1,usedScanner]) && st.finalScannerPos == shifts[usedScanner]))
+            yield return "trycancel";
+        yield return new WaitForSeconds(0.1f);
+        buttons[usedScanner].OnInteract();
     }
 }
