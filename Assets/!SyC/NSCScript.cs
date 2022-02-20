@@ -23,7 +23,7 @@ public class NSCScript : MonoBehaviour
     private readonly string symbtext = "ABCDEFGHLMNOPQXZghlp";
     private int[] binorder = new int[4] { 0, 1, 2, 3 };
     private bool[] neg = new bool[3];
-    private List<int>[] functionlists = new List<int>[2] { new List<int> { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 13, 14, 15, 16, 17, 18, 19 }, new List<int> { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 13, 14, 15, 16, 17, 18, 19 } };
+    private List<int>[] functionlists = new List<int>[2] { new List<int> { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 }, new List<int> { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 13, 14, 15, 16, 17, 18, 19 } };
     private List<int>[] functions = new List<int>[] { new List<int> { }, new List<int> { } };
     private int[] symbols = new int[3];
     private int[] symnums = new int[7];
@@ -461,65 +461,19 @@ public class NSCScript : MonoBehaviour
         for (int i = 0; i < 2; i++)
         {
             int query = 0;
-            bool[] check = Enumerable.Range(3, 3).Select(k => outputs[k, i]).ToArray();
             while (query < functionlists[i].Count())
             {
-                bool[] pass = new bool[2] { false, false };
-                for (int k = 0; k < 2; k++)
+                for (int j = 0; j < 3; j++)
                 {
-                    for (int j = 0; j < 2; j++)
-                        if (check[k * 2] ^ L(outputs[k, j], outputs[k + 1, j], opkey[(functionlists[i][query] * 3) + k + j]))
-                        {
-                            if (pass[0])
-                            {
-                                if (pass[1])
-                                {
-                                    query++;
-                                    goto next;
-                                }
-                                else
-                                    pass[1] = true;
-                            }
-                            else
-                                pass[0] = true;
-                        }
-                }
-                if (info.IsIndicatorPresent(Indicator.CLR))
-                {
-                    if (neg[2])
+                    bool[] vals = new bool[3] {
+                    logops[i * 3 + j][30] == 'T',
+                    logops[i * 3 + j][35] == 'T',
+                    logops[i * 3 + j][39] == 'T'};
+                    char op = opkey[functionlists[i][query] * 3 + j];
+                    if (L(vals[0], vals[1], op) != vals[2])
                     {
-                        if (pass[1] && check[1] ^ L(outputs[0, 0], outputs[2, 0], opkey[(functionlists[i][query] * 3) + 2]) && check[1] ^ L(outputs[0, 1], outputs[2, 1], opkey[functionlists[i][query] * 3]))
-                        {
-                            query++;
-                            goto next;
-                        }
-                    }
-                    else
-                    {
-                        if (pass[1] && check[1] != L(outputs[0, 1], outputs[2, 1], opkey[functionlists[i][query] * 3]) && check[1] != L(outputs[0, 0], outputs[2, 0], opkey[(functionlists[i][query] * 3) + 2]))
-                        {
-                            query++;
-                            goto next;
-                        }
-                    }
-                }
-                else
-                {
-                    if (neg[2])
-                    {
-                        if (pass[1] && check[1] != L(outputs[0, 1], outputs[2, 1], opkey[(functionlists[i][query] * 3) + 2]) && check[1] != L(outputs[0, 0], outputs[2, 0], opkey[functionlists[i][query] * 3]))
-                        {
-                            query++;
-                            goto next;
-                        }
-                    }
-                    else
-                    {
-                        if (pass[1] && check[1] != L(outputs[0, 0], outputs[2, 0], opkey[functionlists[i][query] * 3]) && check[1] != L(outputs[0, 1], outputs[2, 1], opkey[(functionlists[i][query] * 3) + 2]))
-                        {
-                            query++;
-                            goto next;
-                        }
+                        query++;
+                        goto next;
                     }
                 }
                 functionlists[i].RemoveAt(query);
