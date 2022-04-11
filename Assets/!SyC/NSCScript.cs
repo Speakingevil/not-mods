@@ -9,7 +9,6 @@ using System.Collections;
 
 public class NSCScript : MonoBehaviour
 {
-
     public KMAudio Audio;
     public KMBombModule module;
     public KMBombInfo info;
@@ -18,12 +17,12 @@ public class NSCScript : MonoBehaviour
     public Renderer[] leds;
     public Material[] cols;
 
-    private readonly string opkey = "fibcgmhdlnfbdnhciklcemafdfjjglkcaamhjlmfdigkaceinackneehgbad";
+    private readonly string opkey = "fibcgmhdlnfbdnhciklcemafdfjjglkcaamhjlbfdigkaceinackneehgbad";
     private readonly int[] primes = new int[] { 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97 };
     private readonly string symbtext = "ABCDEFGHLMNOPQXZghlp";
     private int[] binorder = new int[4] { 0, 1, 2, 3 };
     private bool[] neg = new bool[3];
-    private List<int>[] functionlists = new List<int>[2] { new List<int> { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 }, new List<int> { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 13, 14, 15, 16, 17, 18, 19 } };
+    private List<int>[] functionlists = new List<int>[2] { new List<int> { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 }, new List<int> { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 } };
     private List<int>[] functions = new List<int>[] { new List<int> { }, new List<int> { } };
     private int[] symbols = new int[3];
     private int[] symnums = new int[7];
@@ -282,7 +281,7 @@ public class NSCScript : MonoBehaviour
             case 10:
                 switch (i)
                 {
-                    case 0: return (((symnums[6] - 1) % 9) - 1) % 2 == 1;
+                    case 0: return (((symnums[6] - 1) % 9) + 1) % 2 == 1;
                     case 1: return Enumerable.Range(0, 3).Select(k => symnums[k]).Any(k => k >= 30);
                     default: return Enumerable.Range(0, 3).Select(k => symnums[k]).Where(k => k > 0).Any(k => symnums[6] % k == 0);
                 }
@@ -303,7 +302,7 @@ public class NSCScript : MonoBehaviour
             case 13:
                 switch (i)
                 {
-                    case 0: return symnums[2] > symnums[1];
+                    case 0: return symnums[2] < symnums[1];
                     case 1: return symnums[6] % 2 == 1;
                     default: return string.Join("", Enumerable.Range(3, 3).Select(k => symnums[k].ToString()).ToArray()).All(k => k != '1');
                 }
@@ -346,7 +345,7 @@ public class NSCScript : MonoBehaviour
                 switch (i)
                 {
                     case 0: int[] p = Enumerable.Range(0, 3).Select(k => symnums[k]).ToArray(); return p.Max() - p.Min() <= 5;
-                    case 1: return Mathf.Abs(symnums[6] / 10 - symnums[6]) > 4;
+                    case 1: return Mathf.Abs((symnums[6] / 10) - (symnums[6] % 10)) > 4;
                     default: return string.Join("", Enumerable.Range(0, 3).Select(k => symnums[k].ToString()).ToArray()).GroupBy(k => k).Any(k => k.Count() > 2);
                 }
         }
@@ -383,7 +382,7 @@ public class NSCScript : MonoBehaviour
                 symnums[i] = 0;
         }
         Debug.LogFormat("[Not Symbolic Coordinates #{0}] The numeric values of the symbols are: {1}", moduleID, string.Join(", ", Enumerable.Range(0, 3).Select(k => symnums[k].ToString()).ToArray()));
-        Debug.LogFormat("[Not Symbolic Coordinates #{0}] {1} of the truth values are negated.", moduleID, neg[1] ? (neg[0] ? "Both" : "The second") : (neg[0] ? "The first" : "Neither"));
+        Debug.LogFormat("[Not Symbolic Coordinates #{0}] {1} of the truth values of each pair are negated.", moduleID, neg[1] ? (neg[0] ? "Both" : "The second") : (neg[0] ? "The first" : "Neither"));
         for (int i = 0; i < 3; i++)
         {
             for (int j = 0; j < 3; j++)
