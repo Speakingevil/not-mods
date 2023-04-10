@@ -325,7 +325,7 @@ public class NSCScript : MonoBehaviour
                 {
                     case 0: return Enumerable.Range(0, 3).Select(k => symnums[k]).All(k => k <= 20);
                     case 1: return symnums[6] > 1 && !primes.Contains(symnums[6]);
-                    default: return symnums[6] % 20 > 9 || (symnums[6] < 9 && symnums[6] % 2 == 1);
+                    default: return symnums[6] % 20 > 9 || (symnums[6] < 10 && symnums[6] % 2 == 1);
                 }
             case 17:
                 switch (i)
