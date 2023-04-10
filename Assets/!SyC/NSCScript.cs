@@ -107,7 +107,7 @@ public class NSCScript : MonoBehaviour
                 switch (i)
                 {
                     case 0: return DateTime.Now.Date.Day;
-                    case 1: return info.GetModuleNames().Select(k => k[0] - 'A' + 1).Max();
+                    case 1: return info.GetModuleNames().Select(k => k.ToUpperInvariant()[0] - 'A' + 1).Max();
                     default: return info.GetSerialNumberLetters().ToArray()[1] - 'A' + 1;
                 }
             case 7:
@@ -253,7 +253,7 @@ public class NSCScript : MonoBehaviour
             case 6:
                 switch (i)
                 {
-                    case 0: return Enumerable.Range(9, 14).All(k => k != (symnums[6] / 10) + (symnums[6] % 10));
+                    case 0: return Enumerable.Range(9, 5).All(k => k != (symnums[6] / 10) + (symnums[6] % 10));
                     case 1: return Enumerable.Range(3, 3).Select(k => symnums[k]).Any(k => k % 9 == 0);
                     default: return symnums[5] < (symnums[0] * 2) % 100;
                 }
@@ -302,7 +302,7 @@ public class NSCScript : MonoBehaviour
             case 13:
                 switch (i)
                 {
-                    case 0: return symnums[2] < symnums[1];
+                    case 0: return symnums[2] > symnums[1];
                     case 1: return symnums[6] % 2 == 1;
                     default: return string.Join("", Enumerable.Range(3, 3).Select(k => symnums[k].ToString()).ToArray()).All(k => k != '1');
                 }
@@ -310,7 +310,7 @@ public class NSCScript : MonoBehaviour
                 switch (i)
                 {
                     case 0: return primes.Count(k => k >= symnums.Min() && k <= symnums.Where((p, q) => q < 3).Max()) == 4;
-                    case 1: return Enumerable.Range(7, 11).All(k => k != (symnums[6] / 10) + (symnums[6] % 10));
+                    case 1: return Enumerable.Range(7, 4).All(k => k != (symnums[6] / 10) + (symnums[6] % 10));
                     default: return Enumerable.Range(0, 3).Select(k => symnums[k]).Count(k => k % 2 == 0) > 1;
                 }
             case 15:
@@ -325,7 +325,7 @@ public class NSCScript : MonoBehaviour
                 {
                     case 0: return Enumerable.Range(0, 3).Select(k => symnums[k]).All(k => k <= 20);
                     case 1: return symnums[6] > 1 && !primes.Contains(symnums[6]);
-                    default: return symnums[0] > symnums[1];
+                    default: return symnums[6] % 20 > 9 || (symnums[6] < 9 && symnums[6] % 2 == 1);
                 }
             case 17:
                 switch (i)
