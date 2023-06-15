@@ -459,6 +459,7 @@ public class NSCScript : MonoBehaviour
         Debug.LogFormat(string.Join("\n", logops));
         for (int i = 0; i < 2; i++)
         {
+            List<int> tempFunctions = new List<int>();
             int query = 0;
             while (query < functionlists[i].Count())
             {
@@ -471,13 +472,15 @@ public class NSCScript : MonoBehaviour
                     char op = opkey[functionlists[i][query] * 3 + j];
                     if (L(vals[0], vals[1], op) != vals[2])
                     {
+                        tempFunctions.Add(functionlists[i][query]);
                         query++;
-                        goto next;
+                        break;
                     }
                 }
-                functionlists[i].RemoveAt(query);
-            next:;
+                query++;
             }
+            for (int k = 0; k < tempFunctions.Count; k++)
+                functionlists[i].Remove(tempFunctions[k]);
             Debug.Log(string.Join(", ", functionlists[i].Select(x => "0123456789ABCDEFGHIJ"[x].ToString()).ToArray()));
             for (int j = 0; j < Mathf.Min(4, functionlists[i].Count()); j++)
                 functions[i].Add(functionlists[i][j]);
