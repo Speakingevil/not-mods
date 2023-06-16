@@ -473,10 +473,7 @@ public class NSCScript : MonoBehaviour
                             if (pass[0])
                             {
                                 if (pass[1])
-                                {
-                                    tempFunctions.Add(functionlists[i][query]);
                                     goto next;
-                                }
                                 else
                                     pass[1] = true;
                             }
@@ -489,18 +486,12 @@ public class NSCScript : MonoBehaviour
                     if (neg[2])
                     {
                         if (pass[1] && check[1] ^ L(outputs[0, 0], outputs[2, 0], opkey[(functionlists[i][query] * 3) + 2]) && check[1] ^ L(outputs[0, 1], outputs[2, 1], opkey[functionlists[i][query] * 3]))
-                        {
-                            tempFunctions.Add(functionlists[i][query]);
                             goto next;
-                        }
                     }
                     else
                     {
                         if (pass[1] && check[1] != L(outputs[0, 1], outputs[2, 1], opkey[functionlists[i][query] * 3]) && check[1] != L(outputs[0, 0], outputs[2, 0], opkey[(functionlists[i][query] * 3) + 2]))
-                        {
-                            tempFunctions.Add(functionlists[i][query]);
                             goto next;
-                        }
                     }
                 }
                 else
@@ -508,20 +499,15 @@ public class NSCScript : MonoBehaviour
                     if (neg[2])
                     {
                         if (pass[1] && check[1] != L(outputs[0, 1], outputs[2, 1], opkey[(functionlists[i][query] * 3) + 2]) && check[1] != L(outputs[0, 0], outputs[2, 0], opkey[functionlists[i][query] * 3]))
-                        {
-                            tempFunctions.Add(functionlists[i][query]);
                             goto next;
-                        }
                     }
                     else
                     {
                         if (pass[1] && check[1] != L(outputs[0, 0], outputs[2, 0], opkey[functionlists[i][query] * 3]) && check[1] != L(outputs[0, 1], outputs[2, 1], opkey[(functionlists[i][query] * 3) + 2]))
-                        {
-                            tempFunctions.Add(functionlists[i][query]);
                             goto next;
-                        }
                     }
                 }
+                tempFunctions.Add(functionlists[i][query]);
                 next:
                 query++;
             }
