@@ -461,22 +461,68 @@ public class NSCScript : MonoBehaviour
         {
             List<int> tempFunctions = new List<int>();
             int query = 0;
+            bool[] check = Enumerable.Range(3, 3).Select(k => outputs[k, i]).ToArray();
             while (query < functionlists[i].Count())
             {
-                for (int j = 0; j < 3; j++)
+                bool[] pass = new bool[2] { false, false };
+                for (int k = 0; k < 2; k++)
                 {
-                    bool[] vals = new bool[3] {
-                    logops[i * 3 + j][30] == 'T',
-                    logops[i * 3 + j][35] == 'T',
-                    logops[i * 3 + j][39] == 'T'};
-                    char op = opkey[functionlists[i][query] * 3 + j];
-                    if (L(vals[0], vals[1], op) != vals[2])
+                    for (int j = 0; j < 2; j++)
+                        if (check[k * 2] ^ L(outputs[k, j], outputs[k + 1, j], opkey[(functionlists[i][query] * 3) + k + j]))
+                        {
+                            if (pass[0])
+                            {
+                                if (pass[1])
+                                {
+                                    tempFunctions.Add(functionlists[i][query]);
+                                    goto next;
+                                }
+                                else
+                                    pass[1] = true;
+                            }
+                            else
+                                pass[0] = true;
+                        }
+                }
+                if (info.IsIndicatorPresent(Indicator.CLR))
+                {
+                    if (neg[2])
                     {
-                        tempFunctions.Add(functionlists[i][query]);
-                        query++;
-                        break;
+                        if (pass[1] && check[1] ^ L(outputs[0, 0], outputs[2, 0], opkey[(functionlists[i][query] * 3) + 2]) && check[1] ^ L(outputs[0, 1], outputs[2, 1], opkey[functionlists[i][query] * 3]))
+                        {
+                            tempFunctions.Add(functionlists[i][query]);
+                            goto next;
+                        }
+                    }
+                    else
+                    {
+                        if (pass[1] && check[1] != L(outputs[0, 1], outputs[2, 1], opkey[functionlists[i][query] * 3]) && check[1] != L(outputs[0, 0], outputs[2, 0], opkey[(functionlists[i][query] * 3) + 2]))
+                        {
+                            tempFunctions.Add(functionlists[i][query]);
+                            goto next;
+                        }
                     }
                 }
+                else
+                {
+                    if (neg[2])
+                    {
+                        if (pass[1] && check[1] != L(outputs[0, 1], outputs[2, 1], opkey[(functionlists[i][query] * 3) + 2]) && check[1] != L(outputs[0, 0], outputs[2, 0], opkey[functionlists[i][query] * 3]))
+                        {
+                            tempFunctions.Add(functionlists[i][query]);
+                            goto next;
+                        }
+                    }
+                    else
+                    {
+                        if (pass[1] && check[1] != L(outputs[0, 0], outputs[2, 0], opkey[functionlists[i][query] * 3]) && check[1] != L(outputs[0, 1], outputs[2, 1], opkey[(functionlists[i][query] * 3) + 2]))
+                        {
+                            tempFunctions.Add(functionlists[i][query]);
+                            goto next;
+                        }
+                    }
+                }
+                next:
                 query++;
             }
             for (int k = 0; k < tempFunctions.Count; k++)
