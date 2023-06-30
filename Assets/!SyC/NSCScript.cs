@@ -471,12 +471,10 @@ public class NSCScript : MonoBehaviour
                     logops[i * 3 + j][39] == 'T'};
                     char op = opkey[functionlists[i][query] * 3 + j];
                     if (L(vals[0], vals[1], op) != vals[2])
-                    {
-                        tempFunctions.Add(functionlists[i][query]);
-                        query++;
-                        break;
-                    }
+                        goto next;
                 }
+                tempFunctions.Add(functionlists[i][query]);
+                next:
                 query++;
             }
             for (int k = 0; k < tempFunctions.Count; k++)
