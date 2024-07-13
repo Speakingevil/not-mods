@@ -466,9 +466,9 @@ public class NSCScript : MonoBehaviour
                 for (int j = 0; j < 3; j++)
                 {
                     bool[] vals = new bool[3] {
-                    logops[i * 3 + j][30] == 'T',
-                    logops[i * 3 + j][35] == 'T',
-                    logops[i * 3 + j][39] == 'T'};
+                    logops[i * 3 + j][logops[i * 3 + j].IndexOf(']') + 2] == 'T',
+                    logops[i * 3 + j][logops[i * 3 + j].IndexOf(']') + 7] == 'T',
+                    logops[i * 3 + j][logops[i * 3 + j].IndexOf(']') + 11] == 'T'};
                     char op = opkey[functionlists[i][query] * 3 + j];
                     if (L(vals[0], vals[1], op) != vals[2])
                         goto next;
