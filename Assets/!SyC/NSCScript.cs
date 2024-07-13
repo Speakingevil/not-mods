@@ -474,7 +474,7 @@ public class NSCScript : MonoBehaviour
                         goto next;
                 }
                 tempFunctions.Add(functionlists[i][query]);
-                next:
+            next:
                 query++;
             }
             for (int k = 0; k < tempFunctions.Count; k++)
